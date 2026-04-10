@@ -35,7 +35,10 @@ export default function Home() {
           </p>
         </div>
         <span className="text-white">
-          {"this is a test to see if the env variables are working: " + process.env.NEXT_PUBLIC_SUPABASE_URL}
+          {"this is a test to see if the env variables are working: "}
+        </span>
+        <span className="text-white">
+          {"this is another test to see if everything is working"}
         </span>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
