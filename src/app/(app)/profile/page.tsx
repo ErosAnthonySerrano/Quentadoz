@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { ToastContainer, useToast } from '@/components/ui/Toast'
 import { useBudgetStore } from '@/store/useBudgetStore'
+import { signOutAction } from '@/app/actions/auth'
 import type { User, UserDefault, UserDefaultCutoff } from '@/types'
 import { ordinalLabel } from '@/utils/budget'
 import { HiPlus, HiMinus } from 'react-icons/hi'
@@ -172,10 +173,13 @@ export default function ProfilePage() {
 
   async function signOut() {
     setSigningOut(true)
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    clearBudget()
-    router.replace('/auth/login')
+    try {
+      clearBudget()
+      await signOutAction()
+    } catch (err) {
+      setSigningOut(false)
+      showToast(err instanceof Error ? err.message : 'Failed to sign out.', 'error')
+    }
   }
 
   async function confirmDelete() {

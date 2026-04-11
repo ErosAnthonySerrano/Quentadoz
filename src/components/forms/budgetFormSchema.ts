@@ -4,7 +4,7 @@ export const itemSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Name is required'),
   amount: z.coerce.number().min(0.01, 'Must be a positive number'),
-  due_date: z.string().min(1, 'Due date is required'),
+  due_date: z.string().optional(),
   custom_fields: z.record(z.string(), z.string()).default({}),
 })
 

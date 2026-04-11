@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   useFieldArray,
   Control,
@@ -12,7 +12,11 @@ import {
 import { HiOutlineTrash } from 'react-icons/hi2'
 import { RiScissorsLine } from 'react-icons/ri'
 import { HiPlus } from 'react-icons/hi'
+import { HiSparkles } from 'react-icons/hi2'
+import { useToast } from '@/components/ui/Toast'
+import { AIUploadModal } from './AIUploadModal'
 import type { FormValues } from './budgetFormSchema'
+import type { ParsedReceiptItem } from '@/types'
 import { ordinalLabel } from '@/utils/budget'
 
 interface CutoffSectionProps {
@@ -43,6 +47,10 @@ export function CutoffSection({
 }: CutoffSectionProps) {
   const columnNameRef = useRef<HTMLInputElement>(null)
   const [salaryDropdownOpen, setSalaryDropdownOpen] = useState(false)
+  const [aiModalOpen, setAiModalOpen] = useState(false)
+  const [aiFilledIds, setAiFilledIds] = useState<Set<string>>(new Set())
+  const pendingAiCountRef = useRef(0)
+  const { show: showToast } = useToast()
 
   const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
     control,
@@ -51,6 +59,20 @@ export function CutoffSection({
 
   const customColumns = watch(`cutoffs.${cutoffIndex}.customColumns`) ?? []
   const cutoffError = errors.cutoffs?.[cutoffIndex]
+
+  // After appendItem calls settle, mark the last N appended fields as AI
+  useEffect(() => {
+    if (pendingAiCountRef.current > 0) {
+      const newIds = itemFields.slice(-pendingAiCountRef.current).map((f) => f.id)
+      setAiFilledIds((prev) => {
+        const next = new Set(prev)
+        newIds.forEach((id) => next.add(id))
+        return next
+      })
+      pendingAiCountRef.current = 0
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemFields.length])
 
   // Default empty date inputs to first day of the selected budget month
   const budgetMonthDefault = `${year}-${String(month).padStart(2, '0')}-01`
@@ -96,11 +118,59 @@ export function CutoffSection({
     appendItem({ name: '', amount: 0, due_date: '', custom_fields: customInit })
   }
 
+  function handleAIParsed(items: ParsedReceiptItem[]) {
+    if (items.length === 0) {
+      showToast('No items found in the image. Please try a different photo.', 'error')
+      return
+    }
+
+    const customInit: Record<string, string> = {}
+    customColumns.forEach((col) => { customInit[col] = '' })
+
+    // If there's exactly one blank row, overwrite it with the first AI item
+    const hasOnlyBlankRow =
+      itemFields.length === 1 &&
+      !watch(`cutoffs.${cutoffIndex}.items.0.name`) &&
+      !watch(`cutoffs.${cutoffIndex}.items.0.amount`)
+
+    items.forEach((item, idx) => {
+      const parsed = {
+        name: item.name,
+        amount: item.amount,
+        due_date: item.due_date || '',
+        custom_fields: { ...customInit },
+      }
+
+      if (idx === 0 && hasOnlyBlankRow) {
+        // Overwrite the first blank row in-place
+        setValue(`cutoffs.${cutoffIndex}.items.0.name`, parsed.name, { shouldDirty: true, shouldValidate: true })
+        setValue(`cutoffs.${cutoffIndex}.items.0.amount`, parsed.amount, { shouldDirty: true, shouldValidate: true })
+        setValue(`cutoffs.${cutoffIndex}.items.0.due_date`, parsed.due_date, { shouldDirty: true, shouldValidate: true })
+        setValue(`cutoffs.${cutoffIndex}.items.0.custom_fields`, parsed.custom_fields, { shouldDirty: true, shouldValidate: true })
+        setAiFilledIds((prev) => new Set(prev).add(itemFields[0].id))
+      } else {
+        appendItem(parsed)
+        pendingAiCountRef.current += 1
+      }
+    })
+
+    showToast(`Added ${items.length} item(s) from receipt.`, 'success')
+  }
+
   return (
     <div className="bg-card rounded-lg shadow-card p-5 mb-5">
       {/* Section header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-header">{ordinalLabel(cutoffIndex + 1)}</h2>
+        <button
+          type="button"
+          onClick={() => setAiModalOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-accent hover:bg-accent-light transition-colors cursor-pointer"
+          title="Scan receipt with AI"
+        >
+          <HiSparkles size={15} />
+          <span>Scan with AI</span>
+        </button>
       </div>
 
       {/* Salary + Date */}
@@ -171,13 +241,13 @@ export function CutoffSection({
       </div>
 
       {/* Items table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto -mx-5 px-5">
+        <table className="w-full text-sm" style={{ minWidth: '480px' }}>
           <thead>
             <tr className="border-b border-line">
-              <th className="text-left py-2 pr-3 text-xs font-medium text-muted w-48">Name</th>
+              <th className="text-left py-2 pr-3 text-xs font-medium text-muted">Name</th>
               <th className="text-left py-2 pr-3 text-xs font-medium text-muted w-32">Amount (₱)</th>
-              <th className="text-left py-2 pr-3 text-xs font-medium text-muted w-36">Due Date</th>
+              <th className="text-left py-2 pr-3 text-xs font-medium text-muted w-32">Due Date</th>
               {customColumns.map((col) => (
                 <th key={col} className="text-left py-2 pr-3 text-xs font-medium text-muted min-w-28">
                   <span className="flex items-center gap-1">
@@ -199,19 +269,27 @@ export function CutoffSection({
           <tbody>
             {itemFields.map((field, itemIndex) => {
               const itemError = cutoffError?.items?.[itemIndex]
+              const isAI = aiFilledIds.has(field.id)
               return (
                 <tr key={field.id} className="border-b border-line-light last:border-0">
                   <td className="py-2 pr-3">
                     <div className="flex flex-col gap-0.5">
-                      <input
-                        type="text"
-                        placeholder="e.g. Netflix"
-                        {...register(`cutoffs.${cutoffIndex}.items.${itemIndex}.name`)}
-                        className={[
-                          'w-full px-2 py-1.5 rounded-md text-sm text-header bg-surface outline-none transition-colors border',
-                          itemError?.name ? 'border-due-danger' : 'border-line',
-                        ].join(' ')}
-                      />
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          placeholder="e.g. Netflix"
+                          {...register(`cutoffs.${cutoffIndex}.items.${itemIndex}.name`)}
+                          className={[
+                            'flex-1 px-2 py-1.5 rounded-md text-sm text-header bg-surface outline-none transition-colors border',
+                            itemError?.name ? 'border-due-danger' : 'border-line',
+                          ].join(' ')}
+                        />
+                        {isAI && (
+                          <span className="shrink-0 px-1.5 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent">
+                            AI
+                          </span>
+                        )}
+                      </div>
                       {itemError?.name && (
                         <span className="text-xs text-due-danger">{itemError.name.message as string}</span>
                       )}
@@ -319,6 +397,14 @@ export function CutoffSection({
 
       {/* Ref for column name (unused — using window.prompt) */}
       <input ref={columnNameRef} type="hidden" />
+
+      {/* AI Upload Modal */}
+      <AIUploadModal
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onSuccess={handleAIParsed}
+        cutoffIndex={cutoffIndex}
+      />
     </div>
   )
 }

@@ -262,11 +262,11 @@ export default function HistoryPage() {
                 <div key={budgetMonth.id} className="bg-card rounded-lg shadow-card overflow-hidden">
 
                   {/* Month header */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-line">
-                    <h3 className="text-base font-semibold text-header">
+                  <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-line">
+                    <h3 className="text-base font-semibold text-header flex-1 min-w-0">
                       {monthLabel} {budgetMonth.year}
                     </h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleReuse(budgetMonth.id)}
