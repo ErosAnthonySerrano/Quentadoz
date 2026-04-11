@@ -1,25 +1,30 @@
 @import "tailwindcss";
 
-:root {
-  --color-bg-primary: #f8f7f4;
-  --color-bg-secondary: #ffffff;
-  --color-bg-card: #ffffff;
+@theme {
+  /* Backgrounds */
+  --color-page: #f8f7f4;
+  --color-secondary: #ffffff;
+  --color-card: #ffffff;
   --color-surface: #f1efe9;
 
-  --color-text-header: #1a1917;
-  --color-text-title: #2d2c29;
-  --color-text-body: #4a4945;
-  --color-text-muted: #8a8880;
+  /* Text */
+  --color-header: #1a1917;
+  --color-title: #2d2c29;
+  --color-body: #4a4945;
+  --color-muted: #8a8880;
 
+  /* Accent */
   --color-accent: #2a6e4e;
   --color-accent-hover: #1f5439;
   --color-accent-light: #e6f2ec;
 
-  --color-status-paid: #2a6e4e;
-  --color-status-paid-bg: #e6f2ec;
-  --color-status-unpaid: #c0392b;
-  --color-status-unpaid-bg: #fdf0ef;
+  /* Status badges */
+  --color-paid: #2a6e4e;
+  --color-paid-bg: #e6f2ec;
+  --color-unpaid: #c0392b;
+  --color-unpaid-bg: #fdf0ef;
 
+  /* Due status */
   --color-due-safe: #2a6e4e;
   --color-due-safe-bg: #e6f2ec;
   --color-due-medium: #1a6fa8;
@@ -29,33 +34,71 @@
   --color-due-danger: #c0392b;
   --color-due-danger-bg: #fdf0ef;
 
-  --color-border: #e4e2db;
-  --color-border-light: #eeece6;
+  /* Borders */
+  --color-line: #e4e2db;
+  --color-line-light: #eeece6;
 
+  /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
 
+  /* Shadows */
   --shadow-card: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
 }
 
+/* Dark mode — overrides the @theme inline CSS variables */
 [data-theme="dark"] {
-  --color-bg-primary: #1c1c1a;
-  --color-bg-secondary: #252523;
-  --color-bg-card: #2a2a28;
+  --color-page: #1c1c1a;
+  --color-secondary: #252523;
+  --color-card: #2a2a28;
   --color-surface: #323230;
-
-  --color-text-header: #f0ede6;
-  --color-text-title: #d8d5ce;
-  --color-text-body: #b0ada6;
-  --color-text-muted: #706e68;
-
+  --color-header: #f0ede6;
+  --color-title: #d8d5ce;
+  --color-body: #b0ada6;
+  --color-muted: #706e68;
   --color-accent: #4aab7e;
   --color-accent-hover: #5bc490;
   --color-accent-light: #1a3328;
-
-  --color-border: #3a3a38;
-  --color-border-light: #2e2e2c;
-
+  --color-paid: #4aab7e;
+  --color-paid-bg: #1a3328;
+  --color-unpaid: #e05a4a;
+  --color-unpaid-bg: #2e1210;
+  --color-due-safe: #4aab7e;
+  --color-due-safe-bg: #1a3328;
+  --color-due-medium: #5aaee0;
+  --color-due-medium-bg: #112840;
+  --color-due-warning: #d4a030;
+  --color-due-warning-bg: #2a2010;
+  --color-due-danger: #e05a4a;
+  --color-due-danger-bg: #2e1210;
+  --color-line: #3a3a38;
+  --color-line-light: #2e2e2c;
   --shadow-card: 0 1px 4px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+body {
+  background-color: var(--color-page);
+  color: var(--color-body);
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+}
+
+body.transitions-ready {
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Theme-aware image switching (no flash — driven by data-theme on <html>) */
+img.theme-dark-only { display: none; }
+img.theme-light-only { display: inline; }
+[data-theme="dark"] img.theme-dark-only { display: inline; }
+[data-theme="dark"] img.theme-light-only { display: none; }
+
+/* Navbar responsive */
+@media (min-width: 768px) {
+  .navbar-desktop { display: block !important; }
+  .navbar-mobile { display: none !important; }
+  .page-content { padding-bottom: 2rem !important; }
 }
