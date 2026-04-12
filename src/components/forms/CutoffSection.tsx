@@ -15,8 +15,9 @@ import { HiPlus } from 'react-icons/hi'
 import { HiSparkles } from 'react-icons/hi2'
 import { useToast } from '@/components/ui/Toast'
 import { AIUploadModal } from './AIUploadModal'
+import { AIOutOfRangeModal } from './AIOutOfRangeModal'
 import type { FormValues } from './budgetFormSchema'
-import type { ParsedReceiptItem } from '@/types'
+import type { ParsedReceiptItemWithCutoff } from '@/types'
 import { ordinalLabel } from '@/utils/budget'
 
 interface CutoffSectionProps {
@@ -40,6 +41,7 @@ export function CutoffSection({
   errors,
   watch,
   setValue,
+  totalCutoffs,
   onDivideItem,
   month,
   year,
@@ -50,6 +52,8 @@ export function CutoffSection({
   const [aiModalOpen, setAiModalOpen] = useState(false)
   const [aiFilledIds, setAiFilledIds] = useState<Set<string>>(new Set())
   const pendingAiCountRef = useRef(0)
+  const [pendingAIItems, setPendingAIItems] = useState<ParsedReceiptItemWithCutoff[] | null>(null)
+  const [outOfRangeModalOpen, setOutOfRangeModalOpen] = useState(false)
   const { show: showToast } = useToast()
 
   const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
@@ -118,22 +122,33 @@ export function CutoffSection({
     appendItem({ name: '', amount: 0, due_date: '', custom_fields: customInit })
   }
 
-  function handleAIParsed(items: ParsedReceiptItem[]) {
-    if (items.length === 0) {
-      showToast('No items found in the image. Please try a different photo.', 'error')
-      return
-    }
-
+  function doInsertItems(items: ParsedReceiptItemWithCutoff[]) {
     const customInit: Record<string, string> = {}
     customColumns.forEach((col) => { customInit[col] = '' })
 
-    // If there's exactly one blank row, overwrite it with the first AI item
+    const sourceCutoffNumber = cutoffIndex + 1
+
+    const thisItems = items.filter(
+      (item) =>
+        item.cutoff_number === null ||
+        item.cutoff_number === sourceCutoffNumber ||
+        item.cutoff_number < 1 ||
+        item.cutoff_number > totalCutoffs
+    )
+    const crossItems = items.filter(
+      (item) =>
+        item.cutoff_number !== null &&
+        item.cutoff_number !== sourceCutoffNumber &&
+        item.cutoff_number >= 1 &&
+        item.cutoff_number <= totalCutoffs
+    )
+
     const hasOnlyBlankRow =
       itemFields.length === 1 &&
       !watch(`cutoffs.${cutoffIndex}.items.0.name`) &&
       !watch(`cutoffs.${cutoffIndex}.items.0.amount`)
 
-    items.forEach((item, idx) => {
+    thisItems.forEach((item, idx) => {
       const parsed = {
         name: item.name,
         amount: item.amount,
@@ -142,7 +157,6 @@ export function CutoffSection({
       }
 
       if (idx === 0 && hasOnlyBlankRow) {
-        // Overwrite the first blank row in-place
         setValue(`cutoffs.${cutoffIndex}.items.0.name`, parsed.name, { shouldDirty: true, shouldValidate: true })
         setValue(`cutoffs.${cutoffIndex}.items.0.amount`, parsed.amount, { shouldDirty: true, shouldValidate: true })
         setValue(`cutoffs.${cutoffIndex}.items.0.due_date`, parsed.due_date, { shouldDirty: true, shouldValidate: true })
@@ -154,7 +168,87 @@ export function CutoffSection({
       }
     })
 
-    showToast(`Added ${items.length} item(s) from receipt.`, 'success')
+    const crossCutoffNumbers = new Set<number>()
+    crossItems.forEach((item) => {
+      const targetIdx = item.cutoff_number! - 1
+      const targetItems = watch(`cutoffs.${targetIdx}.items`) ?? []
+      const targetCustomCols = (watch(`cutoffs.${targetIdx}.customColumns`) ?? []) as string[]
+      const targetCustomInit: Record<string, string> = {}
+      targetCustomCols.forEach((col) => { targetCustomInit[col] = '' })
+
+      const parsed = {
+        name: item.name,
+        amount: item.amount,
+        due_date: item.due_date || '',
+        custom_fields: { ...targetCustomInit },
+      }
+
+      const targetHasOnlyBlankRow =
+        targetItems.length === 1 &&
+        !targetItems[0].name &&
+        (Number(targetItems[0].amount) === 0 || !targetItems[0].amount)
+
+      if (targetHasOnlyBlankRow) {
+        setValue(`cutoffs.${targetIdx}.items`, [parsed], { shouldDirty: true })
+      } else {
+        setValue(`cutoffs.${targetIdx}.items`, [...targetItems, parsed], { shouldDirty: true })
+      }
+
+      crossCutoffNumbers.add(item.cutoff_number!)
+    })
+
+    const totalInserted = thisItems.length + crossItems.length
+    if (crossItems.length > 0) {
+      const labels = Array.from(crossCutoffNumbers).sort().map((n) => ordinalLabel(n)).join(', ')
+      showToast(`${totalInserted} item(s) distributed across cutoffs. Items sent to: ${labels}.`, 'success')
+    } else {
+      showToast(`Added ${totalInserted} item(s) from receipt.`, 'success')
+    }
+  }
+
+  function handleAIParsed(items: ParsedReceiptItemWithCutoff[]) {
+    if (items.length === 0) {
+      showToast('No items found in the image. Please try a different photo.', 'error')
+      return
+    }
+
+    const outOfRangeItems = items.filter(
+      (item) => item.cutoff_number !== null && item.cutoff_number > totalCutoffs
+    )
+
+    if (outOfRangeItems.length > 0) {
+      setPendingAIItems(items)
+      setOutOfRangeModalOpen(true)
+      return
+    }
+
+    doInsertItems(items)
+  }
+
+  function handleOutOfRangeAddAll() {
+    if (!pendingAIItems) return
+    const resolved = pendingAIItems.map((item) =>
+      item.cutoff_number !== null && item.cutoff_number > totalCutoffs
+        ? { ...item, cutoff_number: null }
+        : item
+    )
+    setOutOfRangeModalOpen(false)
+    setPendingAIItems(null)
+    doInsertItems(resolved)
+  }
+
+  function handleOutOfRangeDiscard() {
+    if (!pendingAIItems) return
+    const resolved = pendingAIItems.filter(
+      (item) => item.cutoff_number === null || item.cutoff_number <= totalCutoffs
+    )
+    setOutOfRangeModalOpen(false)
+    setPendingAIItems(null)
+    if (resolved.length === 0) {
+      showToast('All items were discarded — no items matched your cutoffs.', 'error')
+      return
+    }
+    doInsertItems(resolved)
   }
 
   return (
@@ -404,7 +498,21 @@ export function CutoffSection({
         onClose={() => setAiModalOpen(false)}
         onSuccess={handleAIParsed}
         cutoffIndex={cutoffIndex}
+        cutoffCount={totalCutoffs}
       />
+
+      {/* Out-of-range decision modal */}
+      {outOfRangeModalOpen && pendingAIItems && (
+        <AIOutOfRangeModal
+          isOpen={outOfRangeModalOpen}
+          outOfRangeCount={pendingAIItems.filter((i) => i.cutoff_number !== null && i.cutoff_number > totalCutoffs).length}
+          outOfRangeCutoffs={[...new Set(pendingAIItems.filter((i) => i.cutoff_number !== null && i.cutoff_number > totalCutoffs).map((i) => i.cutoff_number!))]}
+          totalCutoffs={totalCutoffs}
+          fallbackLabel={ordinalLabel(cutoffIndex + 1)}
+          onAddAll={handleOutOfRangeAddAll}
+          onDiscard={handleOutOfRangeDiscard}
+        />
+      )}
     </div>
   )
 }

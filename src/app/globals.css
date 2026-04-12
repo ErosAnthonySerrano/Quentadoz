@@ -102,3 +102,15 @@ img.theme-light-only { display: inline; }
   .navbar-mobile { display: none !important; }
   .page-content { padding-bottom: 2rem !important; }
 }
+
+/* Override browser autofill background (prevents white flash in dark mode) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 9999px var(--color-surface) inset !important;
+  box-shadow: 0 0 0 9999px var(--color-surface) inset !important;
+  -webkit-text-fill-color: var(--color-header) !important;
+  caret-color: var(--color-header);
+  transition: background-color 9999s ease-in-out 0s;
+}

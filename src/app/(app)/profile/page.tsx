@@ -197,7 +197,7 @@ export default function ProfilePage() {
 
   if (loadingPage) {
     return (
-      <div className="max-w-xl mx-auto flex flex-col gap-5">
+      <div className="max-w-4xl mx-auto flex flex-col gap-5">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-card rounded-lg shadow-card p-6 h-28 animate-pulse" />
         ))}
@@ -215,7 +215,7 @@ export default function ProfilePage() {
     JSON.stringify(savedDefaults.cutoffs) !== JSON.stringify(defCutoffs)
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col gap-5 pb-8">
+    <div className="max-w-4xl mx-auto flex flex-col gap-5 pb-8">
       <h1 className="text-3xl font-semibold text-header">Profile & Settings</h1>
 
       {/* Account info */}

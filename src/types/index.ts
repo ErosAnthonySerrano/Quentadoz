@@ -43,6 +43,10 @@ export interface ParsedReceiptItem {
   due_date: string | null
 }
 
+export interface ParsedReceiptItemWithCutoff extends ParsedReceiptItem {
+  cutoff_number: number | null
+}
+
 export interface UserDefaultCutoff {
   cutoff_number: number
   salary: number

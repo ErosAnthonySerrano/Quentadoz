@@ -27,6 +27,10 @@ export default function HistoryPage() {
   const router = useRouter()
   const { toasts, show: showToast, dismiss } = useToast()
 
+  const now = new Date()
+  const currentMonth = now.getMonth() + 1
+  const currentYear = now.getFullYear()
+
   const [loadState, setLoadState] = useState<LoadState>('loading')
   const [records, setRecords] = useState<MonthRecord[]>([])
   const [exportingIds, setExportingIds] = useState<Set<string>>(new Set())
@@ -257,14 +261,20 @@ export default function HistoryPage() {
               const totalSalary = cutoffs.reduce((sum, c) => sum + Number(c.salary), 0)
               const totalExpenses = items.reduce((sum, i) => sum + Number(i.amount), 0)
               const totalSavings = totalSalary - totalExpenses
+              const isCurrentMonth = budgetMonth.month === currentMonth && budgetMonth.year === currentYear
 
               return (
-                <div key={budgetMonth.id} className="bg-card rounded-lg shadow-card overflow-hidden">
+                <div key={budgetMonth.id} className={['bg-card rounded-lg shadow-card overflow-hidden', isCurrentMonth ? 'ring-2 ring-accent' : ''].join(' ')}>
 
                   {/* Month header */}
                   <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-line">
-                    <h3 className="text-base font-semibold text-header flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-header flex-1 min-w-0 flex items-center gap-2">
                       {monthLabel} {budgetMonth.year}
+                      {isCurrentMonth && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent">
+                          Current
+                        </span>
+                      )}
                     </h3>
                     <div className="flex items-center gap-2 shrink-0">
                       <button

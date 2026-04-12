@@ -4,13 +4,15 @@ import React, { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { HiArrowUpTray, HiOutlineXMark, HiSparkles, HiDocument, HiDocumentText } from 'react-icons/hi2'
-import type { ParsedReceiptItem } from '@/types'
+import type { ParsedReceiptItemWithCutoff } from '@/types'
 
 interface AIUploadModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess: (items: ParsedReceiptItem[]) => void
+  onSuccess: (items: ParsedReceiptItemWithCutoff[]) => void
   cutoffIndex: number
+  cutoffCount: number
+  title?: string
 }
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic']
@@ -26,7 +28,7 @@ function getFileTypeLabel(type: string): string {
   return 'Text file'
 }
 
-export function AIUploadModal({ isOpen, onClose, onSuccess, cutoffIndex }: AIUploadModalProps) {
+export function AIUploadModal({ isOpen, onClose, onSuccess, cutoffIndex, cutoffCount, title = 'Scan Receipt' }: AIUploadModalProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
@@ -102,7 +104,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess, cutoffIndex }: AIUpl
       const response = await fetch('/api/parse-receipt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ storageUrl }),
+        body: JSON.stringify({ storageUrl, cutoffCount }),
       })
 
       if (!response.ok) {
@@ -137,7 +139,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess, cutoffIndex }: AIUpl
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-card rounded-lg shadow-card p-6 w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-header">Scan Receipt</h3>
+          <h3 className="text-base font-semibold text-header">{title}</h3>
           <button
             onClick={handleClose}
             type="button"
@@ -184,9 +186,16 @@ export function AIUploadModal({ isOpen, onClose, onSuccess, cutoffIndex }: AIUpl
 
         {/* Help text */}
         {!selectedFile && (
-          <p className="text-xs text-muted mb-4">
-            Upload an image, PDF, CSV, or text file containing expense data. We'll extract the items and amounts.
-          </p>
+          <div className="mb-4 flex flex-col gap-2">
+            <p className="text-xs text-muted">
+              Upload an image, PDF, CSV, or text file containing expense data. We'll extract the items and amounts.
+            </p>
+            {cutoffCount > 1 && (
+              <p className="text-xs text-accent bg-accent-light rounded-md px-3 py-2">
+                If your document has labeled sections (e.g. &quot;1st Cutoff&quot;, &quot;2nd Cutoff&quot;), items will be sent to the correct cutoffs automatically.
+              </p>
+            )}
+          </div>
         )}
 
         {/* Actions */}

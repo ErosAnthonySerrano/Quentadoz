@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const RequestSchema = z.object({
   storageUrl: z.string().url(),
+  cutoffCount: z.number().int().positive(),
 })
 
 export async function POST(request: NextRequest) {
@@ -22,13 +23,15 @@ export async function POST(request: NextRequest) {
     // Parse and validate request body
     const body = await request.json()
     let storageUrl: string
+    let cutoffCount: number
 
     try {
       const validated = RequestSchema.parse(body)
       storageUrl = validated.storageUrl
+      cutoffCount = validated.cutoffCount
     } catch (err) {
       return NextResponse.json(
-        { error: 'Invalid request: missing or invalid storageUrl' },
+        { error: 'Invalid request: missing or invalid storageUrl or cutoffCount' },
         { status: 400 }
       )
     }
@@ -36,7 +39,7 @@ export async function POST(request: NextRequest) {
     // Parse the file using Gemini
     let items
     try {
-      items = await parseReceiptFile(storageUrl)
+      items = await parseReceiptFile(storageUrl, cutoffCount)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       console.error('Gemini parsing error:', message)

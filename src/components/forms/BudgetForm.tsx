@@ -7,12 +7,16 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { ToastContainer, useToast } from '@/components/ui/Toast'
+import { HiSparkles } from 'react-icons/hi2'
 import { CutoffSection } from './CutoffSection'
 import { DivideModal } from './DivideModal'
 import { formSchema, emptyCutoff, emptyItem } from './budgetFormSchema'
 import type { FormValues, ItemFormValue } from './budgetFormSchema'
 import { ordinalLabel, formatCurrency, formatDate } from '@/utils/budget'
-import type { BudgetMonth, Cutoff, BudgetItem, UserDefaultCutoff } from '@/types'
+import { AIUploadModal } from './AIUploadModal'
+import { AIOutOfRangeModal } from './AIOutOfRangeModal'
+import { AICutoffPickerModal } from './AICutoffPickerModal'
+import type { BudgetMonth, Cutoff, BudgetItem, UserDefaultCutoff, ParsedReceiptItemWithCutoff } from '@/types'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -111,6 +115,12 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
 
   // Divide modal state
   const [divideTarget, setDivideTarget] = useState<DivideTarget | null>(null)
+
+  // Global AI modal state
+  const [globalAiModalOpen, setGlobalAiModalOpen] = useState(false)
+  const [pendingGlobalAIItems, setPendingGlobalAIItems] = useState<ParsedReceiptItemWithCutoff[] | null>(null)
+  const [globalAIOutOfRangeModalOpen, setGlobalAIOutOfRangeModalOpen] = useState(false)
+  const [globalAICutoffPickerOpen, setGlobalAICutoffPickerOpen] = useState(false)
 
   // React Hook Form
   const {
@@ -372,6 +382,125 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
     }
 
     setStep(2)
+  }
+
+  // ── Global AI parse (entire budget) ─────────────────────────────────────
+
+  function doInsertGlobalItems(items: ParsedReceiptItemWithCutoff[]) {
+    const cutoffCount = cutoffFields.length
+    const crossCutoffNumbers = new Set<number>()
+
+    items.forEach((item) => {
+      const targetIdx =
+        item.cutoff_number !== null &&
+        item.cutoff_number >= 1 &&
+        item.cutoff_number <= cutoffCount
+          ? item.cutoff_number - 1
+          : 0
+
+      const targetCustomCols = (getValues(`cutoffs.${targetIdx}.customColumns`) ?? []) as string[]
+      const targetCustomInit: Record<string, string> = {}
+      targetCustomCols.forEach((col) => { targetCustomInit[col] = '' })
+
+      const parsed: ItemFormValue = {
+        name: item.name,
+        amount: item.amount,
+        due_date: item.due_date || '',
+        custom_fields: { ...targetCustomInit },
+      }
+
+      const targetItems = getValues(`cutoffs.${targetIdx}.items`) ?? []
+      const targetHasOnlyBlankRow =
+        targetItems.length === 1 &&
+        !targetItems[0].name &&
+        (Number(targetItems[0].amount) === 0 || !targetItems[0].amount)
+
+      if (targetHasOnlyBlankRow) {
+        setValue(`cutoffs.${targetIdx}.items`, [parsed], { shouldDirty: true })
+      } else {
+        setValue(`cutoffs.${targetIdx}.items`, [...targetItems, parsed], { shouldDirty: true })
+      }
+
+      if (item.cutoff_number !== null && item.cutoff_number >= 1 && item.cutoff_number <= cutoffCount) {
+        crossCutoffNumbers.add(item.cutoff_number)
+      }
+    })
+
+    if (crossCutoffNumbers.size > 1) {
+      const labels = Array.from(crossCutoffNumbers).sort().map((n) => ordinalLabel(n)).join(', ')
+      showToast(`${items.length} item(s) distributed across cutoffs: ${labels}.`, 'success')
+    } else {
+      showToast(`Added ${items.length} item(s) from document.`, 'success')
+    }
+  }
+
+  function handleGlobalAIParsed(items: ParsedReceiptItemWithCutoff[]) {
+    if (items.length === 0) {
+      showToast('No items found in the document. Please try a different file.', 'error')
+      return
+    }
+
+    const outOfRangeItems = items.filter(
+      (item) => item.cutoff_number !== null && item.cutoff_number > cutoffFields.length
+    )
+
+    if (outOfRangeItems.length > 0) {
+      setPendingGlobalAIItems(items)
+      setGlobalAIOutOfRangeModalOpen(true)
+      return
+    }
+
+    // All items have null cutoff_number (e.g. plain receipt with no sections) —
+    // ask the user which cutoff to put them in, but only when there are multiple cutoffs.
+    const allUnlabeled = items.every((item) => item.cutoff_number === null)
+    if (allUnlabeled && cutoffFields.length > 1) {
+      setPendingGlobalAIItems(items)
+      setGlobalAICutoffPickerOpen(true)
+      return
+    }
+
+    doInsertGlobalItems(items)
+  }
+
+  function handleCutoffPickerConfirm(cutoffIndex: number) {
+    if (!pendingGlobalAIItems) return
+    const resolved = pendingGlobalAIItems.map((item) => ({ ...item, cutoff_number: cutoffIndex + 1 }))
+    setGlobalAICutoffPickerOpen(false)
+    setPendingGlobalAIItems(null)
+    doInsertGlobalItems(resolved)
+  }
+
+  function handleCutoffPickerCancel() {
+    setGlobalAICutoffPickerOpen(false)
+    setPendingGlobalAIItems(null)
+  }
+
+  function handleGlobalOutOfRangeAddAll() {
+    if (!pendingGlobalAIItems) return
+    const cutoffCount = cutoffFields.length
+    const resolved = pendingGlobalAIItems.map((item) =>
+      item.cutoff_number !== null && item.cutoff_number > cutoffCount
+        ? { ...item, cutoff_number: null }
+        : item
+    )
+    setGlobalAIOutOfRangeModalOpen(false)
+    setPendingGlobalAIItems(null)
+    doInsertGlobalItems(resolved)
+  }
+
+  function handleGlobalOutOfRangeDiscard() {
+    if (!pendingGlobalAIItems) return
+    const cutoffCount = cutoffFields.length
+    const resolved = pendingGlobalAIItems.filter(
+      (item) => item.cutoff_number === null || item.cutoff_number <= cutoffCount
+    )
+    setGlobalAIOutOfRangeModalOpen(false)
+    setPendingGlobalAIItems(null)
+    if (resolved.length === 0) {
+      showToast('All items were discarded — no items matched your cutoffs.', 'error')
+      return
+    }
+    doInsertGlobalItems(resolved)
   }
 
   // ── Divide item ─────────────────────────────────────────────────────────
@@ -791,6 +920,24 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
           </div>
         </div>
 
+        {/* Global AI scan — only shown when there are multiple cutoffs */}
+        {cutoffFields.length > 1 && (
+          <div className="bg-card rounded-lg shadow-card p-5 mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-header">Scan entire budget with AI</p>
+              <p className="text-xs text-muted mt-0.5">Upload one document that covers all your cutoffs — items will be routed automatically.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setGlobalAiModalOpen(true)}
+              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-accent hover:bg-accent-light transition-colors cursor-pointer"
+            >
+              <HiSparkles size={15} />
+              <span>Scan All</span>
+            </button>
+          </div>
+        )}
+
         {/* Cutoff sections */}
         {cutoffFields.map((field, i) => {
           const otherSalaries = cutoffFields
@@ -841,6 +988,40 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
             itemAmount={Number(watch(`cutoffs.${divideTarget.cutoffIndex}.items.${divideTarget.itemIndex}.amount`)) || 0}
             onConfirm={confirmDivide}
             onClose={() => setDivideTarget(null)}
+          />
+        )}
+
+        {/* Global AI modal */}
+        <AIUploadModal
+          isOpen={globalAiModalOpen}
+          onClose={() => setGlobalAiModalOpen(false)}
+          onSuccess={handleGlobalAIParsed}
+          cutoffIndex={0}
+          cutoffCount={cutoffFields.length}
+          title="Scan Entire Budget"
+        />
+
+        {/* Global out-of-range decision modal */}
+        {globalAIOutOfRangeModalOpen && pendingGlobalAIItems && (
+          <AIOutOfRangeModal
+            isOpen={globalAIOutOfRangeModalOpen}
+            outOfRangeCount={pendingGlobalAIItems.filter((i) => i.cutoff_number !== null && i.cutoff_number > cutoffFields.length).length}
+            outOfRangeCutoffs={[...new Set(pendingGlobalAIItems.filter((i) => i.cutoff_number !== null && i.cutoff_number > cutoffFields.length).map((i) => i.cutoff_number!))]}
+            totalCutoffs={cutoffFields.length}
+            fallbackLabel="1st Cutoff"
+            onAddAll={handleGlobalOutOfRangeAddAll}
+            onDiscard={handleGlobalOutOfRangeDiscard}
+          />
+        )}
+
+        {/* Cutoff picker modal (receipt with no section labels on multi-cutoff budget) */}
+        {globalAICutoffPickerOpen && pendingGlobalAIItems && (
+          <AICutoffPickerModal
+            isOpen={globalAICutoffPickerOpen}
+            itemCount={pendingGlobalAIItems.length}
+            totalCutoffs={cutoffFields.length}
+            onConfirm={handleCutoffPickerConfirm}
+            onCancel={handleCutoffPickerCancel}
           />
         )}
 
