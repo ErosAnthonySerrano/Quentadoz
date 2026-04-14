@@ -146,6 +146,7 @@ export default function DashboardPage() {
           </div>
 
           <ExpensesTableWidget
+            cutoffs={cutoffs}
             items={items}
             updatingIds={updatingIds}
             onChangeStatus={handleChangeStatus}

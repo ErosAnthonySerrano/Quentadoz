@@ -268,10 +268,10 @@ export default function HistoryPage() {
 
                   {/* Month header */}
                   <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-line">
-                    <h3 className="text-base font-semibold text-header flex-1 min-w-0 flex items-center gap-2">
-                      {monthLabel} {budgetMonth.year}
+                    <h3 className="text-base font-semibold text-header flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span>{monthLabel} {budgetMonth.year}</span>
                       {isCurrentMonth && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent">
+                        <span className="inline-flex items-center self-start px-2 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent">
                           Current
                         </span>
                       )}
@@ -304,8 +304,8 @@ export default function HistoryPage() {
                     </div>
                   </div>
 
-                  {/* Scrollable table */}
-                  <div className="overflow-x-auto">
+                  {/* Desktop table */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-sm min-w-96">
                       <thead>
                         <tr className="border-b border-line text-left">
@@ -391,6 +391,100 @@ export default function HistoryPage() {
                         </tr>
                       </tbody>
                     </table>
+                  </div>
+
+                  {/* Mobile card list */}
+                  <div className="md:hidden flex flex-col gap-4 p-4">
+                    {cutoffs.map((cutoff) => {
+                      const cutoffItems = items.filter((i) => i.cutoff_id === cutoff.id)
+                      const cutoffExpenses = cutoffItems.reduce((sum, i) => sum + Number(i.amount), 0)
+                      const remaining = Number(cutoff.salary) - cutoffExpenses
+
+                      return (
+                        <div key={cutoff.id}>
+                          {/* Cutoff header */}
+                          <div className="flex flex-wrap items-baseline gap-1.5 mb-2 pb-2 border-b border-line">
+                            <span className="text-sm font-semibold text-title">
+                              {ordinalLabel(cutoff.cutoff_number)}
+                            </span>
+                            {cutoff.salary ? (
+                              <span className="text-xs text-muted">{formatCurrency(Number(cutoff.salary))}</span>
+                            ) : null}
+                            {cutoff.date ? (
+                              <span className="text-xs text-muted">· {formatDate(cutoff.date)}</span>
+                            ) : null}
+                          </div>
+
+                          {/* Item cards */}
+                          {cutoffItems.length === 0 ? (
+                            <p className="text-xs text-muted italic py-2">No items</p>
+                          ) : (
+                            <div className="flex flex-col gap-2 mb-3">
+                              {cutoffItems.map((item) => (
+                                <div
+                                  key={item.id}
+                                  className="bg-surface rounded-md px-3 py-2.5 flex items-start justify-between gap-2"
+                                >
+                                  <div className="flex flex-col gap-0.5 min-w-0">
+                                    <span className="text-sm font-medium text-body truncate">{item.name}</span>
+                                    {item.due_date && (
+                                      <span className="text-xs text-muted">Due {formatDate(item.due_date ?? null)}</span>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col items-end gap-1 shrink-0">
+                                    <span className="text-sm font-semibold text-body tabular-nums">
+                                      {formatCurrency(Number(item.amount))}
+                                    </span>
+                                    <span className={[
+                                      'inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium',
+                                      item.status === 'paid'
+                                        ? 'bg-paid-bg text-paid'
+                                        : 'bg-card text-muted border border-line',
+                                    ].join(' ')}>
+                                      {item.status === 'paid' ? 'Paid' : 'Unpaid'}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Cutoff summary */}
+                          <div className="flex gap-3 rounded-md bg-surface px-3 py-2">
+                            <div className="flex-1">
+                              <p className="text-xs text-muted mb-0.5">Total Expenses</p>
+                              <p className="text-sm font-semibold text-body tabular-nums">{formatCurrency(cutoffExpenses)}</p>
+                            </div>
+                            <div className="w-px bg-line-light" />
+                            <div className="flex-1">
+                              <p className="text-xs text-muted mb-0.5">Remaining</p>
+                              <p className={`text-sm font-semibold tabular-nums ${remaining < 0 ? 'text-due-danger' : 'text-due-safe'}`}>
+                                {formatCurrency(remaining)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                    {/* Monthly total card */}
+                    <div className="rounded-md border border-line bg-surface px-3 py-3 flex flex-col gap-1.5">
+                      <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-1">Monthly Total</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted">Total Salary</span>
+                        <span className="text-sm font-medium text-body tabular-nums">{formatCurrency(totalSalary)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted">Total Expenses</span>
+                        <span className="text-sm font-medium text-body tabular-nums">{formatCurrency(totalExpenses)}</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-1.5 border-t border-line-light">
+                        <span className="text-xs font-semibold text-muted">Savings</span>
+                        <span className={`text-sm font-bold tabular-nums ${totalSavings < 0 ? 'text-due-danger' : 'text-due-safe'}`}>
+                          {formatCurrency(totalSavings)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )

@@ -334,8 +334,8 @@ export function CutoffSection({
         </div>
       </div>
 
-      {/* Items table */}
-      <div className="overflow-x-auto -mx-5 px-5">
+      {/* Items table — desktop only */}
+      <div className="hidden md:block overflow-x-auto -mx-5 px-5">
         <table className="w-full text-sm" style={{ minWidth: '480px' }}>
           <thead>
             <tr className="border-b border-line">
@@ -467,6 +467,134 @@ export function CutoffSection({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Items cards — mobile only */}
+      <div className="md:hidden flex flex-col gap-3 mt-3">
+        {customColumns.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {customColumns.map((col) => (
+              <span key={col} className="inline-flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium bg-surface text-muted border border-line">
+                {col}
+                <button
+                  type="button"
+                  onClick={() => removeColumn(col)}
+                  className="text-muted hover:text-due-danger transition-colors"
+                  title={`Remove "${col}" column`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        {itemFields.map((field, itemIndex) => {
+          const itemError = cutoffError?.items?.[itemIndex]
+          const isAI = aiFilledIds.has(field.id)
+          return (
+            <div key={field.id} className="bg-surface rounded-md p-3 flex flex-col gap-2.5">
+              {/* Row: name + AI badge + actions */}
+              <div className="flex items-start gap-2">
+                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="text"
+                      placeholder="e.g. Netflix"
+                      {...register(`cutoffs.${cutoffIndex}.items.${itemIndex}.name`)}
+                      className={[
+                        'flex-1 px-2 py-1.5 rounded-md text-sm text-header bg-card outline-none transition-colors border',
+                        itemError?.name ? 'border-due-danger' : 'border-line',
+                      ].join(' ')}
+                    />
+                    {isAI && (
+                      <span className="shrink-0 px-1.5 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent">
+                        AI
+                      </span>
+                    )}
+                  </div>
+                  {itemError?.name && (
+                    <span className="text-xs text-due-danger">{itemError.name.message as string}</span>
+                  )}
+                </div>
+                {/* Action buttons */}
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onDivideItem(cutoffIndex, itemIndex)}
+                    title="Divide across cutoffs"
+                    className="p-1.5 rounded-md text-muted hover:text-accent hover:bg-card transition-colors"
+                  >
+                    <RiScissorsLine size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(itemIndex)}
+                    disabled={itemFields.length === 1}
+                    title="Remove item"
+                    className="p-1.5 rounded-md text-muted hover:text-due-danger hover:bg-card transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <HiOutlineTrash size={15} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Amount + Due Date side by side */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-0.5">
+                  <label className="text-xs font-medium text-muted">Amount (₱)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...register(`cutoffs.${cutoffIndex}.items.${itemIndex}.amount`)}
+                    className={[
+                      'w-full px-2 py-1.5 rounded-md text-sm text-header bg-card outline-none transition-colors border',
+                      itemError?.amount ? 'border-due-danger' : 'border-line',
+                    ].join(' ')}
+                  />
+                  {itemError?.amount && (
+                    <span className="text-xs text-due-danger">{itemError.amount.message as string}</span>
+                  )}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <label className="text-xs font-medium text-muted">Due Date</label>
+                  <input
+                    type="date"
+                    {...register(`cutoffs.${cutoffIndex}.items.${itemIndex}.due_date`)}
+                    onFocus={(e) =>
+                      handleDateFocus(e, `cutoffs.${cutoffIndex}.items.${itemIndex}.due_date`)
+                    }
+                    className={[
+                      'w-full px-2 py-1.5 rounded-md text-sm text-header bg-card outline-none transition-colors border',
+                      itemError?.due_date ? 'border-due-danger' : 'border-line',
+                    ].join(' ')}
+                  />
+                  {itemError?.due_date && (
+                    <span className="text-xs text-due-danger">{itemError.due_date.message as string}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Custom columns */}
+              {customColumns.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {customColumns.map((col) => (
+                    <div key={col} className="flex flex-col gap-0.5">
+                      <label className="text-xs font-medium text-muted">{col}</label>
+                      <input
+                        type="text"
+                        placeholder={col}
+                        {...register(`cutoffs.${cutoffIndex}.items.${itemIndex}.custom_fields.${col}`)}
+                        className="w-full px-2 py-1.5 rounded-md text-sm text-header bg-card outline-none transition-colors border border-line"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Add item + add column */}
