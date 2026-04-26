@@ -10,7 +10,10 @@ interface Props {
 
 export function DueSoonBanner({ count, onDismiss }: Props) {
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-md bg-due-danger-bg text-due-danger text-sm font-medium shadow-sm border border-due-danger">
+    <div
+      className="flex items-center justify-between gap-3 px-4 py-3 rounded-md text-due-danger text-sm font-medium border border-due-danger"
+      style={{ background: 'color-mix(in oklab, var(--color-due-danger-bg) 70%, transparent)' }}
+    >
       <div className="flex items-center gap-2.5">
         <RiAlertLine size={18} className="shrink-0" />
         <span>

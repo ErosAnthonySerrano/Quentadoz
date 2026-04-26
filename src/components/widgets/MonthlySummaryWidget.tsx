@@ -15,13 +15,13 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
   const totalSavings = totalSalary - totalExpenses
 
   return (
-    <div className="bg-card rounded-md p-6 shadow-md shadow-black/20 border border-line">
+    <div className="dashboard-card p-6">
       <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-4">
         Monthly Summary
       </h3>
 
       {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto max-w-full">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
@@ -63,7 +63,7 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
             })}
           </tbody>
           <tfoot>
-            <tr className="bg-surface">
+            <tr className="bg-surface/70">
               <td className="px-3 py-3 font-semibold text-header">
                 Total ({formatCurrency(totalSalary)} salary)
               </td>
@@ -91,18 +91,18 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
             .reduce((sum, i) => sum + i.amount, 0)
           const remaining = c.salary - cutoffExpenses
           return (
-            <div key={c.id} className="bg-surface rounded-md p-4 shadow-sm border border-line">
+            <div key={c.id} className="dashboard-chip rounded-md p-4 min-w-0">
               <span className="text-xs font-semibold text-muted uppercase tracking-wide">
                 {ordinalLabel(c.cutoff_number)}
               </span>
               <div className="mt-2 flex flex-col gap-1.5">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted">Total Expenses</span>
-                  <span className="text-sm font-medium text-body">{formatCurrency(cutoffExpenses)}</span>
+                <div className="flex justify-between items-center gap-3 min-w-0">
+                  <span className="text-xs text-muted min-w-0">Total Expenses</span>
+                  <span className="text-sm font-medium text-body shrink-0">{formatCurrency(cutoffExpenses)}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted">Remaining Balance</span>
-                  <span className={`text-sm font-semibold ${remaining >= 0 ? 'text-due-safe' : 'text-due-danger'}`}>
+                <div className="flex justify-between items-center gap-3 min-w-0">
+                  <span className="text-xs text-muted min-w-0">Remaining Balance</span>
+                  <span className={`text-sm font-semibold shrink-0 ${remaining >= 0 ? 'text-due-safe' : 'text-due-danger'}`}>
                     {formatCurrency(remaining)}
                   </span>
                 </div>
@@ -111,20 +111,20 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
           )
         })}
         {/* Monthly total card */}
-        <div className="bg-surface rounded-md p-4 border border-line shadow-sm">
+        <div className="dashboard-chip rounded-md p-4 min-w-0">
           <span className="text-xs font-semibold text-muted uppercase tracking-wide">Monthly Total</span>
           <div className="mt-2 flex flex-col gap-1.5">
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-muted">Total Salary</span>
-              <span className="text-sm font-medium text-body">{formatCurrency(totalSalary)}</span>
+            <div className="flex justify-between items-center gap-3 min-w-0">
+              <span className="text-xs text-muted min-w-0">Total Salary</span>
+              <span className="text-sm font-medium text-body shrink-0">{formatCurrency(totalSalary)}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-muted">Total Expenses</span>
-              <span className="text-sm font-medium text-body">{formatCurrency(totalExpenses)}</span>
+            <div className="flex justify-between items-center gap-3 min-w-0">
+              <span className="text-xs text-muted min-w-0">Total Expenses</span>
+              <span className="text-sm font-medium text-body shrink-0">{formatCurrency(totalExpenses)}</span>
             </div>
-            <div className="flex justify-between items-center pt-1.5 border-t border-line-light">
-              <span className="text-xs font-semibold text-muted">Total Savings</span>
-              <span className={`text-sm font-semibold ${totalSavings >= 0 ? 'text-due-safe' : 'text-due-danger'}`}>
+            <div className="flex justify-between items-center gap-3 pt-1.5 border-t border-line-light min-w-0">
+              <span className="text-xs font-semibold text-muted min-w-0">Total Savings</span>
+              <span className={`text-sm font-semibold shrink-0 ${totalSavings >= 0 ? 'text-due-safe' : 'text-due-danger'}`}>
                 {formatCurrency(totalSavings)}
               </span>
             </div>

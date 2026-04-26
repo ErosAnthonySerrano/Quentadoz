@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { PageBackground } from "@/components/ui/PageBackground";
 
 export const metadata: Metadata = {
   title: "Quentadoz",
@@ -20,7 +21,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <PageBackground />
+        <div className="relative z-10 min-h-screen">{children}</div>
+      </body>
     </html>
   );
 }

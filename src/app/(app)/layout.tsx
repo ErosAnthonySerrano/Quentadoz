@@ -34,9 +34,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
-      <main className="page-content flex-1 max-w-screen-xl w-full mx-auto px-6 py-8 pb-20">
+      <main className="page-content flex-1 max-w-screen-xl w-full mx-auto px-4 sm:px-6 pt-24 md:pt-28 pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-28">
         {children}
       </main>
     </div>
