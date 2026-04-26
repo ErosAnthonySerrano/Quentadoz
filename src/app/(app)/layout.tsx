@@ -2,12 +2,15 @@
 
 import React, { useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/ui/Navbar'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [isLoading, setIsLoading] = React.useState(true)
+  const isDashboardRoute = pathname === '/dashboard'
 
   useEffect(() => {
     async function checkAuth() {
@@ -36,7 +39,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
-      <main className="page-content flex-1 max-w-screen-xl w-full mx-auto px-4 sm:px-6 pt-24 md:pt-28 pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-28">
+      <main
+        className={[
+          'page-content flex-1 w-full mx-auto px-4 sm:px-6 xl:px-8 2xl:px-10 pt-24 md:pt-28 pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-28',
+          isDashboardRoute ? '' : 'max-w-screen-xl',
+        ].join(' ')}
+      >
         {children}
       </main>
     </div>

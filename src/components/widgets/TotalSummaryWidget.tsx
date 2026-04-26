@@ -19,7 +19,7 @@ export function TotalSummaryWidget({ cutoffs, items }: Props) {
     : 0
 
   return (
-    <div className="dashboard-card p-6">
+    <div className="dashboard-card p-6 h-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">
           Total Summary
@@ -29,8 +29,8 @@ export function TotalSummaryWidget({ cutoffs, items }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-8">
-        <div className="min-w-0 flex-1 space-y-5 md:max-w-[28rem]">
+      <div className="flex items-center justify-between gap-4 sm:gap-6 lg:gap-8">
+        <div className="min-w-0 flex-1 space-y-5">
           <div className="flex min-w-0 flex-col gap-1.5">
             <span className="text-xs text-muted font-medium">Total Salary</span>
             <span className="block max-w-full text-[clamp(1.25rem,2.4vw,2.5rem)] font-semibold text-header leading-[1.05] whitespace-nowrap overflow-hidden text-ellipsis">
@@ -50,7 +50,7 @@ export function TotalSummaryWidget({ cutoffs, items }: Props) {
           </div>
         </div>
 
-        <div className="shrink-0 self-start md:self-center md:ml-2">
+        <div className="shrink-0 self-center sm:ml-2">
           <div
             className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full p-1"
             style={{

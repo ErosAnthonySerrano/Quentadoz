@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { BudgetItem, Cutoff } from '@/types'
 import { formatCurrency, formatDate, getDueStatus, dueStatusClasses, ordinalLabel } from '@/utils/budget'
 import { Button } from '@/components/ui/Button'
-import { HiOutlinePencilSquare } from 'react-icons/hi2'
+import { HiChevronLeft, HiChevronRight, HiOutlinePencilSquare } from 'react-icons/hi2'
 import { ExpenseIdentityBadge } from '@/components/widgets/ExpenseIdentityBadge'
 
 interface Props {
@@ -17,8 +17,34 @@ interface Props {
 }
 
 export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatus, budgetMonthId }: Props) {
+  const ROWS_PER_PAGE = 10
+  const [activeCutoffIdx, setActiveCutoffIdx] = React.useState(0)
+  const [itemPage, setItemPage] = React.useState(0)
+
+  React.useEffect(() => {
+    setActiveCutoffIdx((prev) => Math.min(prev, Math.max(0, cutoffs.length - 1)))
+  }, [cutoffs.length])
+
+  React.useEffect(() => {
+    setItemPage(0)
+  }, [activeCutoffIdx])
+
+  const activeCutoff = cutoffs[activeCutoffIdx] ?? null
+  const activeCutoffItems = activeCutoff
+    ? items.filter((i) => i.cutoff_id === activeCutoff.id)
+    : []
+  const itemPageCount = Math.max(1, Math.ceil(activeCutoffItems.length / ROWS_PER_PAGE))
+  const safeItemPage = Math.min(itemPage, itemPageCount - 1)
+  const itemStart = safeItemPage * ROWS_PER_PAGE
+  const itemEnd = Math.min(activeCutoffItems.length, itemStart + ROWS_PER_PAGE)
+  const pagedActiveCutoffItems = activeCutoffItems.slice(itemStart, itemEnd)
+
+  React.useEffect(() => {
+    setItemPage((prev) => Math.min(prev, itemPageCount - 1))
+  }, [itemPageCount])
+
   return (
-    <div className="dashboard-card p-6">
+    <div className="dashboard-card p-6 h-full flex flex-col min-h-0">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">Expenses</h3>
         <Link
@@ -33,25 +59,77 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
       {items.length === 0 ? (
         <p className="text-sm text-muted text-center py-8">No expenses added yet.</p>
       ) : (
-        <div className="flex flex-col gap-6">
-          {cutoffs.map((cutoff) => {
-            const cutoffItems = items.filter((i) => i.cutoff_id === cutoff.id)
-            return (
-              <div key={cutoff.id}>
-                <div className="flex flex-wrap items-baseline gap-2 mb-3 pb-2 border-b border-line min-w-0">
-                  <span className="text-sm font-semibold text-title min-w-0">
-                    {ordinalLabel(cutoff.cutoff_number)}
-                  </span>
-                  <span className="text-xs text-muted min-w-0 break-words">
-                    {formatDate(cutoff.date)} - {formatCurrency(cutoff.salary)}
-                  </span>
+        <>
+          <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0">
+            {activeCutoff ? (
+              <>
+                <div className="flex items-center justify-between gap-3 mb-3 pb-2 border-b border-line min-w-0">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-2 min-w-0">
+                      <span className="text-sm font-semibold text-title min-w-0">
+                        {ordinalLabel(activeCutoff.cutoff_number)}
+                      </span>
+                      <span className="text-xs text-muted min-w-0 break-words">
+                        {formatDate(activeCutoff.date)} - {formatCurrency(activeCutoff.salary)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      className="dashboard-chip h-7 w-7 rounded-md text-muted disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                      onClick={() => setActiveCutoffIdx((idx) => Math.max(0, idx - 1))}
+                      disabled={activeCutoffIdx === 0}
+                      aria-label="Previous cutoff"
+                    >
+                      <HiChevronLeft size={14} />
+                    </button>
+                    <span className="text-[11px] text-muted min-w-[3.25rem] text-center">
+                      {activeCutoffIdx + 1}/{cutoffs.length}
+                    </span>
+                    <button
+                      type="button"
+                      className="dashboard-chip h-7 w-7 rounded-md text-muted disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                      onClick={() => setActiveCutoffIdx((idx) => Math.min(cutoffs.length - 1, idx + 1))}
+                      disabled={activeCutoffIdx >= cutoffs.length - 1}
+                      aria-label="Next cutoff"
+                    >
+                      <HiChevronRight size={14} />
+                    </button>
+                  </div>
                 </div>
 
-                {cutoffItems.length === 0 ? (
-                  <p className="text-sm text-muted py-3 text-center">No expenses for this cutoff.</p>
+                {activeCutoffItems.length === 0 ? (
+                  <p className="text-sm text-muted py-6 text-center">No expenses for this cutoff.</p>
                 ) : (
-                  <>
-                    <div className="hidden md:block">
+                  <div className="min-h-0 flex flex-col">
+                    {activeCutoffItems.length > ROWS_PER_PAGE && (
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[11px] text-muted">
+                          Showing {itemStart + 1}-{itemEnd} of {activeCutoffItems.length} items
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            className="dashboard-chip h-6 px-2 rounded-sm text-[11px] text-muted disabled:opacity-40 disabled:cursor-not-allowed"
+                            onClick={() => setItemPage((p) => Math.max(0, p - 1))}
+                            disabled={safeItemPage === 0}
+                          >
+                            Prev
+                          </button>
+                          <button
+                            type="button"
+                            className="dashboard-chip h-6 px-2 rounded-sm text-[11px] text-muted disabled:opacity-40 disabled:cursor-not-allowed"
+                            onClick={() => setItemPage((p) => Math.min(itemPageCount - 1, p + 1))}
+                            disabled={safeItemPage >= itemPageCount - 1}
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="min-h-0 overflow-auto">
                       <table className="w-full border-collapse text-sm">
                         <thead>
                           <tr>
@@ -66,7 +144,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                           </tr>
                         </thead>
                         <tbody>
-                          {cutoffItems.map((item) => {
+                          {pagedActiveCutoffItems.map((item) => {
                             const status = getDueStatus(item.due_date)
                             const cls = dueStatusClasses[status]
                             const isPaid = item.status === 'paid'
@@ -110,7 +188,31 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted py-6 text-center">No cutoffs available.</p>
+            )}
+          </div>
 
+          <div className="md:hidden flex flex-col gap-6">
+            {cutoffs.map((cutoff) => {
+              const cutoffItems = items.filter((i) => i.cutoff_id === cutoff.id)
+              return (
+                <div key={cutoff.id}>
+                  <div className="flex flex-wrap items-baseline gap-2 mb-3 pb-2 border-b border-line min-w-0">
+                    <span className="text-sm font-semibold text-title min-w-0">
+                      {ordinalLabel(cutoff.cutoff_number)}
+                    </span>
+                    <span className="text-xs text-muted min-w-0 break-words">
+                      {formatDate(cutoff.date)} - {formatCurrency(cutoff.salary)}
+                    </span>
+                  </div>
+
+                  {cutoffItems.length === 0 ? (
+                    <p className="text-sm text-muted py-3 text-center">No expenses for this cutoff.</p>
+                  ) : (
                     <div className="md:hidden flex flex-col gap-2">
                       {cutoffItems.map((item) => {
                         const status = getDueStatus(item.due_date)
@@ -160,12 +262,12 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                         )
                       })}
                     </div>
-                  </>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </>
       )}
     </div>
   )

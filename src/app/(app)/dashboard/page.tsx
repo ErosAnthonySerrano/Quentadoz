@@ -129,8 +129,9 @@ export default function DashboardPage() {
       {loadState === 'empty' && <EmptyState />}
 
       {loadState === 'loaded' && budgetMonth && (
-        <div className="flex flex-col gap-6 pb-16">
-          <section className="dashboard-card p-5 sm:p-6 md:p-8">
+        <div className="flex flex-col gap-6 pb-16 xl:pb-0 xl:h-full xl:min-h-0 xl:overflow-hidden">
+          <div className="flex flex-col gap-6 xl:grid xl:grid-cols-3 xl:grid-rows-[auto_minmax(0,1fr)] xl:items-stretch xl:gap-5 xl:flex-1 xl:min-h-0">
+          <section className="dashboard-card p-5 sm:p-6 md:p-8 xl:col-span-1 xl:h-full">
             <div className="flex flex-col gap-5 sm:gap-6">
               <div>
                 <h1 className="text-3xl sm:text-4xl font-semibold text-header flex items-center gap-2 min-w-0">
@@ -152,20 +153,27 @@ export default function DashboardPage() {
             )}
           </section>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="xl:col-span-1 xl:min-h-0 xl:h-full">
             <CutoffSalaryWidget cutoffs={cutoffs} />
+          </div>
+          <div className="xl:col-span-1 xl:min-h-0 xl:h-full">
             <TotalSummaryWidget cutoffs={cutoffs} items={items} />
           </div>
 
-          <ExpensesTableWidget
-            cutoffs={cutoffs}
-            items={items}
-            updatingIds={updatingIds}
-            onChangeStatus={handleChangeStatus}
-            budgetMonthId={budgetMonth.id}
-          />
+          <div className="xl:col-span-2 xl:min-h-0">
+            <ExpensesTableWidget
+              cutoffs={cutoffs}
+              items={items}
+              updatingIds={updatingIds}
+              onChangeStatus={handleChangeStatus}
+              budgetMonthId={budgetMonth.id}
+            />
+          </div>
 
-          <MonthlySummaryWidget cutoffs={cutoffs} items={items} />
+          <div className="xl:col-span-1 xl:min-h-0">
+            <MonthlySummaryWidget cutoffs={cutoffs} items={items} />
+          </div>
+          </div>
         </div>
       )}
 

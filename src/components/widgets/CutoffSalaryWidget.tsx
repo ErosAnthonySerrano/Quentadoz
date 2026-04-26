@@ -11,7 +11,7 @@ interface Props {
 
 export function CutoffSalaryWidget({ cutoffs }: Props) {
   return (
-    <div className="dashboard-card p-6">
+    <div className="dashboard-card p-6 h-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">
           Cutoff Salary Overview
