@@ -10,13 +10,13 @@ interface Props {
 
 export function CutoffSalaryWidget({ cutoffs }: Props) {
   return (
-    <div className="bg-card rounded-lg shadow-card p-6">
+    <div className="bg-card rounded-lg shadow-md shadow-black/20 border border-line p-6">
       <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-4">
         Cutoff Salary Overview
       </h3>
       <div className="flex flex-wrap gap-3">
         {cutoffs.map((c) => (
-          <div key={c.id} className="flex flex-col gap-1 p-4 bg-surface rounded-md flex-1 basis-36">
+          <div key={c.id} className="flex flex-col gap-1 p-4 bg-surface rounded-md flex-1 basis-36 shadow-sm border border-line">
             <span className="text-xs font-semibold text-muted uppercase tracking-wide">
               {ordinalLabel(c.cutoff_number)}
             </span>

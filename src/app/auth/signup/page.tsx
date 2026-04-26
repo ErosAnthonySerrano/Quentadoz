@@ -101,13 +101,13 @@ export default function SignupPage() {
   if (success) {
     return (
       <div className="min-h-svh flex items-center justify-center py-6 px-4 bg-page">
-        <div className="w-full max-w-sm bg-card rounded-lg shadow-card border border-line px-8 py-10 flex flex-col items-center gap-5 text-center">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-accent-light text-accent text-xl font-semibold">✓</div>
+        <div className="w-full max-w-sm bg-card rounded-lg shadow-md border border-line px-8 py-10 flex flex-col items-center gap-5 text-center">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-accent-light text-accent text-xl font-semibold shadow-sm">✓</div>
           <h2 className="text-2xl font-semibold text-header">Check your email</h2>
           <p className="text-sm text-muted">
             We sent a confirmation link to your email address. Click the link to activate your account.
           </p>
-          <Link href="/auth/login" className="text-xs text-accent font-medium no-underline">
+          <Link href="/auth/login" className="text-xs text-accent font-medium no-underline hover:underline">
             Back to login
           </Link>
         </div>
@@ -117,7 +117,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-svh flex items-center justify-center py-6 px-4 bg-page">
-      <div className="w-full max-w-sm bg-card rounded-lg shadow-card border border-line px-8 py-10 flex flex-col gap-5">
+      <div className="w-full max-w-sm bg-card rounded-lg shadow-md border border-line px-8 py-10 flex flex-col gap-5">
         <div className="flex flex-col items-center gap-1">
           <BrandLogo width={180} />
           <p className="text-sm text-muted">Create your account</p>
@@ -126,7 +126,7 @@ export default function SignupPage() {
         <button
           onClick={handleGoogleSignup}
           disabled={oauthLoading || isSubmitting}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-5 rounded-md border border-line bg-secondary text-body text-sm font-medium cursor-pointer transition-colors hover:bg-surface disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 w-full py-2.5 px-5 rounded-md border border-line bg-secondary text-body text-sm font-medium cursor-pointer transition-all shadow-sm hover:bg-surface active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {oauthLoading ? (
             <span className="inline-block w-3.5 h-3.5 border-2 border-body/20 border-t-body rounded-full animate-spin" />
@@ -149,6 +149,7 @@ export default function SignupPage() {
             autoComplete="email"
             error={errors.email?.message}
             {...register('email')}
+            className="shadow-sm"
           />
 
           <div className="flex flex-col gap-1.5">
@@ -159,10 +160,11 @@ export default function SignupPage() {
               {...register('password', {
                 onChange: (e) => setPasswordValue(e.target.value),
               })}
+              className="shadow-sm"
             />
             {passwordValue && (
               <div className="flex flex-col gap-1">
-                <div className="h-1 bg-line rounded-sm overflow-hidden">
+                <div className="h-1 bg-line rounded-sm overflow-hidden shadow-sm">
                   <div
                     className="h-full rounded-sm transition-all duration-200"
                     style={{ width: strength.width, backgroundColor: strength.color }}
@@ -180,20 +182,21 @@ export default function SignupPage() {
             autoComplete="new-password"
             error={errors.confirmPassword?.message}
             {...register('confirmPassword')}
+            className="shadow-sm"
           />
 
           {serverError && (
-            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm">{serverError}</p>
+            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm border border-due-danger shadow-sm">{serverError}</p>
           )}
 
-          <Button type="submit" fullWidth loading={isSubmitting} disabled={oauthLoading}>
+          <Button type="submit" fullWidth loading={isSubmitting} disabled={oauthLoading} className="shadow-sm active:scale-95 transition-all">
             Create Account
           </Button>
         </form>
 
         <p className="text-center text-xs text-muted">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-accent font-medium no-underline">
+          <Link href="/auth/login" className="text-accent font-medium no-underline hover:underline">
             Sign in
           </Link>
         </p>

@@ -15,7 +15,7 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
   const totalSavings = totalSalary - totalExpenses
 
   return (
-    <div className="bg-card rounded-lg shadow-card p-6">
+    <div className="bg-card rounded-md p-6 shadow-md shadow-black/20 border border-line">
       <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-4">
         Monthly Summary
       </h3>
@@ -91,7 +91,7 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
             .reduce((sum, i) => sum + i.amount, 0)
           const remaining = c.salary - cutoffExpenses
           return (
-            <div key={c.id} className="bg-surface rounded-md p-4">
+            <div key={c.id} className="bg-surface rounded-md p-4 shadow-sm border border-line">
               <span className="text-xs font-semibold text-muted uppercase tracking-wide">
                 {ordinalLabel(c.cutoff_number)}
               </span>
@@ -111,7 +111,7 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
           )
         })}
         {/* Monthly total card */}
-        <div className="bg-surface rounded-md p-4 border border-line">
+        <div className="bg-surface rounded-md p-4 border border-line shadow-sm">
           <span className="text-xs font-semibold text-muted uppercase tracking-wide">Monthly Total</span>
           <div className="mt-2 flex flex-col gap-1.5">
             <div className="flex justify-between items-center">
@@ -134,4 +134,3 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
     </div>
   )
 }
-

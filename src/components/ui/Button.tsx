@@ -29,7 +29,7 @@ export function Button({
       {...props}
       disabled={disabled || loading}
       className={[
-        'inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer',
+        'inline-flex items-center justify-center shadow-sm gap-2 px-5 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer',
         'disabled:opacity-60 disabled:cursor-not-allowed',
         variantClasses[variant],
         fullWidth ? 'w-full' : '',

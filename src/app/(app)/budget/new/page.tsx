@@ -18,7 +18,7 @@ function NewBudgetContent() {
 
 export default function NewBudgetPage() {
   return (
-    <Suspense fallback={<div className="max-w-4xl mx-auto pb-8"><div className="h-9 w-48 bg-surface rounded-md animate-pulse mb-8" /><div className="bg-card rounded-lg shadow-card p-5 h-40 animate-pulse" /></div>}>
+    <Suspense fallback={<div className="max-w-4xl mx-auto pb-8"><div className="h-9 w-48 bg-surface rounded-md animate-pulse mb-8" /><div className="bg-card rounded-lg shadow-md border border-line p-5 h-40 animate-pulse" /></div>}>
       <NewBudgetContent />
     </Suspense>
   )

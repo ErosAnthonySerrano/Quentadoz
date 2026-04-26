@@ -137,7 +137,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess, cutoffIndex, cutoffC
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-lg shadow-card p-6 w-full max-w-md">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6 w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-header">{title}</h3>
           <button

@@ -33,7 +33,7 @@ export function DivideModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-lg shadow-card p-6 w-full max-w-sm">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6 w-full max-w-sm">
         <h3 className="text-base font-semibold text-header mb-1">Divide Item</h3>
         <p className="text-xs text-muted mb-4">
           &ldquo;{itemName}&rdquo; (₱{itemAmount.toLocaleString('en-PH', { minimumFractionDigits: 2 })})

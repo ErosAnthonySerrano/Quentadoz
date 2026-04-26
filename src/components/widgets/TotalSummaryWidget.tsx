@@ -15,7 +15,7 @@ export function TotalSummaryWidget({ cutoffs, items }: Props) {
   const totalSavings = totalSalary - totalExpenses
 
   return (
-    <div className="bg-card rounded-lg shadow-card p-6">
+    <div className="bg-card rounded-lg shadow-md shadow-black/20 border border-line p-6">
       <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-4">
         Total Summary
       </h3>

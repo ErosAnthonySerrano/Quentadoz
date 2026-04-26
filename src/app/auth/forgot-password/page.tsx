@@ -46,13 +46,13 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <div className="min-h-svh flex items-center justify-center py-6 px-4 bg-page">
-        <div className="w-full max-w-sm bg-card rounded-lg shadow-card border border-line px-8 py-10 flex flex-col items-center gap-4 text-center">
-          <div className="text-4xl">✉</div>
+        <div className="w-full max-w-sm bg-card rounded-lg shadow-md border border-line px-8 py-10 flex flex-col items-center gap-4 text-center">
+          <div className="text-4xl shadow-sm rounded-full w-12 h-12 flex items-center justify-center bg-surface">✉</div>
           <h2 className="text-2xl font-semibold text-header">Check your email</h2>
           <p className="text-sm text-muted">
             Password reset link sent. Check your email and follow the link to reset your password.
           </p>
-          <Link href="/auth/login" className="text-xs text-accent font-medium no-underline">
+          <Link href="/auth/login" className="text-xs text-accent font-medium no-underline hover:underline">
             Back to login
           </Link>
         </div>
@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-svh flex items-center justify-center py-6 px-4 bg-page">
-      <div className="w-full max-w-sm bg-card rounded-lg shadow-card border border-line px-8 py-10 flex flex-col gap-5">
+      <div className="w-full max-w-sm bg-card rounded-lg shadow-md border border-line px-8 py-10 flex flex-col gap-5">
         <div className="text-center">
           <div className="flex justify-center mb-3">
             <BrandLogo width={160} />
@@ -80,19 +80,20 @@ export default function ForgotPasswordPage() {
             autoComplete="email"
             error={errors.email?.message}
             {...register('email')}
+            className="shadow-md"
           />
 
           {serverError && (
-            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm">{serverError}</p>
+            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm border border-due-danger shadow-md">{serverError}</p>
           )}
 
-          <Button type="submit" fullWidth loading={isSubmitting}>
+          <Button type="submit" fullWidth loading={isSubmitting} className="shadow-md active:scale-95 transition-all">
             Send Reset Link
           </Button>
         </form>
 
         <p className="text-center">
-          <Link href="/auth/login" className="text-xs text-accent font-medium no-underline">
+          <Link href="/auth/login" className="text-xs text-accent font-medium no-underline hover:underline">
             ← Back to login
           </Link>
         </p>

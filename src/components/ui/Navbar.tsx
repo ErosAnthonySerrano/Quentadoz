@@ -38,7 +38,7 @@ export function Navbar() {
       </header>
 
       {/* Desktop top navbar */}
-      <header className="navbar-desktop hidden bg-card border-b border-line sticky top-0 z-100">
+      <header className="navbar-desktop hidden bg-card border-b border-line sticky top-0 z-100 shadow-md">
         <div className="max-w-screen-xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2 no-underline">
@@ -51,10 +51,10 @@ export function Navbar() {
                   key={href}
                   href={href}
                   className={[
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-sm no-underline transition-colors',
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-sm no-underline transition-all',
                     pathname === href
-                      ? 'text-accent font-semibold'
-                      : 'text-body font-normal hover:bg-surface',
+                      ? 'text-accent font-semibold bg-accent-light shadow-sm'
+                      : 'text-body font-normal hover:bg-surface hover:shadow-sm',
                   ].join(' ')}
                 >
                   <Icon size={16} />
@@ -68,20 +68,20 @@ export function Navbar() {
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="flex items-center justify-center w-9 h-9 rounded-sm text-body bg-transparent border-none cursor-pointer hover:bg-surface transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-sm text-body bg-transparent border border-transparent cursor-pointer hover:bg-surface hover:border-line hover:shadow-sm transition-all active:scale-95"
             >
               {ThemeIcon && <ThemeIcon size={18} />}
             </button>
             <Link
               href="/profile"
               aria-label="Profile"
-              className="flex items-center justify-center w-9 h-9 rounded-sm text-body no-underline hover:bg-surface transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-sm text-body no-underline border border-transparent hover:bg-surface hover:border-line hover:shadow-sm transition-all active:scale-95"
             >
               <RiUserLine size={18} />
             </Link>
             <Link
               href="/budget/new"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-accent text-white text-sm font-medium no-underline hover:bg-accent-hover transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-accent text-white text-sm font-medium no-underline hover:bg-accent-hover shadow-md active:scale-95 transition-all"
             >
               <HiOutlinePlusCircle size={16} />
               Add Budget

@@ -36,11 +36,11 @@ export function getDueStatus(dueDate: string | null): DueStatus {
 }
 
 export const dueStatusClasses: Record<DueStatus, { row: string; text: string }> = {
-  safe:    { row: 'bg-due-safe-bg',    text: 'text-due-safe' },
-  medium:  { row: 'bg-due-medium-bg',  text: 'text-due-medium' },
-  warning: { row: 'bg-due-warning-bg', text: 'text-due-warning' },
-  danger:  { row: 'bg-due-danger-bg',  text: 'text-due-danger' },
-  none:    { row: '',                  text: 'text-body' },
+  safe:    { row: '',    text: 'text-due-safe' },
+  medium:  { row: '',  text: 'text-due-medium' },
+  warning: { row: '', text: 'text-due-warning' },
+  danger:  { row: '',  text: 'text-due-danger' },
+  none:    { row: '',  text: 'text-body' },
 }
 
 export function ordinalLabel(n: number): string {

@@ -17,7 +17,7 @@ function DeleteModal({ onConfirm, onClose, loading }: { onConfirm: () => void; o
   const [typed, setTyped] = useState('')
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-lg shadow-card p-6 w-full max-w-sm">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6 w-full max-w-sm">
         <h3 className="text-base font-semibold text-header mb-2">Delete Account</h3>
         <p className="text-sm text-body mb-4">
           This action is <strong>permanent</strong> and cannot be undone. All your budget data will be deleted.
@@ -27,7 +27,7 @@ function DeleteModal({ onConfirm, onClose, loading }: { onConfirm: () => void; o
           type="text"
           value={typed}
           onChange={(e) => setTyped(e.target.value)}
-          className="w-full px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none mb-4"
+          className="w-full px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none mb-4 shadow-md focus:border-accent transition-all"
           placeholder="DELETE"
           autoFocus
         />
@@ -199,7 +199,7 @@ export default function ProfilePage() {
     return (
       <div className="max-w-4xl mx-auto flex flex-col gap-5">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-card rounded-lg shadow-card p-6 h-28 animate-pulse" />
+          <div key={i} className="bg-card rounded-lg shadow-md border border-line p-6 h-28 animate-pulse" />
         ))}
       </div>
     )
@@ -219,7 +219,7 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-semibold text-header">Profile & Settings</h1>
 
       {/* Account info */}
-      <div className="bg-card rounded-lg shadow-card p-6">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6">
         <h2 className="text-base font-semibold text-header mb-4">Account Information</h2>
         <div className="flex flex-col gap-3 text-sm">
           <div className="flex justify-between">
@@ -242,7 +242,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Budget Defaults */}
-      <div className="bg-card rounded-lg shadow-card p-6">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6">
         <h2 className="text-base font-semibold text-header mb-1">Budget Defaults</h2>
         <p className="text-xs text-muted mb-5">
           These defaults auto-fill your salary and credit dates when creating a new budget.
@@ -255,7 +255,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setDefCutoffCount((n) => Math.max(1, n - 1))}
-              className="w-8 h-8 rounded-md bg-surface border border-line flex items-center justify-center text-body hover:bg-line transition-colors"
+              className="w-8 h-8 rounded-md bg-surface border border-line flex items-center justify-center text-body hover:bg-line transition-all shadow-sm active:scale-95"
             >
               <HiMinus size={14} />
             </button>
@@ -263,7 +263,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setDefCutoffCount((n) => Math.min(31, n + 1))}
-              className="w-8 h-8 rounded-md bg-surface border border-line flex items-center justify-center text-body hover:bg-line transition-colors"
+              className="w-8 h-8 rounded-md bg-surface border border-line flex items-center justify-center text-body hover:bg-line transition-all shadow-sm active:scale-95"
             >
               <HiPlus size={14} />
             </button>
@@ -273,7 +273,7 @@ export default function ProfilePage() {
         {/* Per-cutoff salary + day */}
         <div className="flex flex-col gap-4 mb-5">
           {defCutoffs.map((cutoff, i) => (
-            <div key={i} className="p-4 bg-surface rounded-lg border border-line-light">
+            <div key={i} className="p-4 bg-surface rounded-lg border border-line shadow-sm">
               <p className="text-sm font-semibold text-header mb-3">{ordinalLabel(i + 1)}</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
@@ -284,8 +284,9 @@ export default function ProfilePage() {
                     step="0.01"
                     placeholder="0.00"
                     value={cutoff.salary || ''}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => updateDefCutoff(i, 'salary', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-md text-sm text-header bg-card border border-line outline-none"
+                    className="w-full px-3 py-2 rounded-md text-sm text-header bg-card border border-line outline-none shadow-sm focus:border-accent transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -296,11 +297,12 @@ export default function ProfilePage() {
                     max="31"
                     placeholder="e.g. 15"
                     value={cutoff.day ?? ''}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => {
                       const v = parseInt(e.target.value, 10)
                       updateDefCutoff(i, 'day', isNaN(v) ? null : Math.min(31, Math.max(1, v)))
                     }}
-                    className="w-full px-3 py-2 rounded-md text-sm text-header bg-card border border-line outline-none"
+                    className="w-full px-3 py-2 rounded-md text-sm text-header bg-card border border-line outline-none shadow-sm focus:border-accent transition-all"
                   />
                   <span className="text-xs text-muted">Day 1–31. If it doesn&apos;t exist in the month, it&apos;ll be left blank.</span>
                 </div>
@@ -309,14 +311,14 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        <Button onClick={saveDefaults} loading={savingDefaults} disabled={!hasChanges || savingDefaults}>
+        <Button onClick={saveDefaults} loading={savingDefaults} disabled={!hasChanges || savingDefaults} className="shadow-sm">
           Save Defaults
         </Button>
       </div>
 
       {/* Change password */}
       {isEmailUser && (
-        <div className="bg-card rounded-lg shadow-card p-6">
+        <div className="bg-card rounded-lg shadow-md border border-line p-6">
           <h2 className="text-base font-semibold text-header mb-1">Change Password</h2>
           <p className="text-xs text-muted mb-4">
             We&apos;ll send a password reset link to your email address.
@@ -326,7 +328,7 @@ export default function ProfilePage() {
               A password reset link has been sent to your email.
             </p>
           ) : (
-            <Button variant="secondary" onClick={sendPasswordReset} loading={sendingReset}>
+            <Button variant="secondary" onClick={sendPasswordReset} loading={sendingReset} className="shadow-sm">
               Send Password Reset Email
             </Button>
           )}
@@ -334,21 +336,21 @@ export default function ProfilePage() {
       )}
 
       {/* Sign out */}
-      <div className="bg-card rounded-lg shadow-card p-6">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6">
         <h2 className="text-base font-semibold text-header mb-1">Sign Out</h2>
         <p className="text-xs text-muted mb-4">You will be redirected to the login page.</p>
-        <Button variant="secondary" onClick={signOut} loading={signingOut}>
+        <Button variant="secondary" onClick={signOut} loading={signingOut} className="shadow-sm">
           Sign Out
         </Button>
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-due-danger-bg border border-due-danger rounded-lg p-6">
+      <div className="bg-due-danger-bg border border-due-danger rounded-lg p-6 shadow-sm">
         <h2 className="text-base font-semibold text-due-danger mb-1">Danger Zone</h2>
         <p className="text-xs text-body mb-4">
           This action is permanent and cannot be undone. All your budget data will be deleted.
         </p>
-        <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
+        <Button variant="danger" onClick={() => setShowDeleteModal(true)} className="shadow-sm">
           Delete My Account
         </Button>
       </div>

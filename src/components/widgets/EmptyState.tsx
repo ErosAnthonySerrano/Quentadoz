@@ -13,9 +13,9 @@ export function EmptyState() {
       </p>
       <Link
         href="/budget/new"
-        className="inline-flex items-center px-6 py-2.5 rounded-md bg-accent text-white text-sm font-medium no-underline mt-2 hover:bg-accent-hover transition-colors"
+        className="inline-flex items-center px-6 py-2.5 rounded-md bg-accent text-white text-sm font-medium no-underline mt-2 hover:bg-accent-hover shadow-md active:scale-95 transition-all"
       >
-        Add Budget
+        Create Your First Budget
       </Link>
     </div>
   )

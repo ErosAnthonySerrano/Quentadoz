@@ -70,7 +70,7 @@ export default function HistoryPage() {
         supabase.from('budget_items').select('*').in('budget_month_id', ids).order('created_at'),
       ])
 
-      const monthRecords: MonthRecord[] = bms.map((bm) => ({
+      const monthRecords: MonthRecord[] = bms.map((bm: BudgetMonth) => ({
         budgetMonth: bm,
         cutoffs: (cutoffs ?? []).filter((c) => c.budget_month_id === bm.id),
         items: (items ?? []).filter((i) => i.budget_month_id === bm.id),
@@ -84,25 +84,27 @@ export default function HistoryPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const allYears = useMemo(() => {
-    return [...new Set(records.map((r) => r.budgetMonth.year))].sort((a, b) => b - a)
+  const allYears = useMemo<number[]>(() => {
+    const years = records.map((r) => r.budgetMonth.year)
+    const uniqueYears = Array.from(new Set(years))
+    return uniqueYears.sort((a, b) => b - a)
   }, [records])
 
-  const filtered = useMemo(() => {
+  const filtered = useMemo<MonthRecord[]>(() => {
     return records.filter((r) => {
       if (filterYear !== 'all' && r.budgetMonth.year !== filterYear) return false
-      if (filterFromMonth !== 'all' && r.budgetMonth.month < filterFromMonth) return false
-      if (filterToMonth !== 'all' && r.budgetMonth.month > filterToMonth) return false
+      if (filterFromMonth !== 'all' && r.budgetMonth.month < (filterFromMonth as number)) return false
+      if (filterToMonth !== 'all' && r.budgetMonth.month > (filterToMonth as number)) return false
       return true
     })
   }, [records, filterYear, filterFromMonth, filterToMonth])
 
-  const groupedByYear = useMemo(() => {
+  const groupedByYear = useMemo<[number, MonthRecord[]][]>(() => {
     const map = new Map<number, MonthRecord[]>()
-    filtered.forEach((r) => {
+    filtered.forEach((r: MonthRecord) => {
       const yr = r.budgetMonth.year
-      if (!map.has(yr)) map.set(yr, [])
-      map.get(yr)!.push(r)
+      const existing = map.get(yr) ?? []
+      map.set(yr, [...existing, r])
     })
     return Array.from(map.entries()).sort((a, b) => b[0] - a[0])
   }, [filtered])
@@ -121,7 +123,11 @@ export default function HistoryPage() {
 
   async function handleExportPDF(record: MonthRecord) {
     const id = record.budgetMonth.id
-    setExportingIds((prev) => new Set([...prev, id]))
+    setExportingIds((prev) => {
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
     try {
       const { exportMonthPDF } = await import('@/lib/pdf')
       await exportMonthPDF(record)
@@ -141,10 +147,10 @@ export default function HistoryPage() {
   if (loadState === 'loading') {
     return (
       <div className="flex flex-col gap-6 pb-8">
-        <div className="h-9 w-48 bg-surface rounded-md animate-pulse" />
-        <div className="bg-card rounded-lg shadow-card p-4 h-16 animate-pulse" />
+        <div className="h-9 w-48 bg-surface rounded-md animate-pulse shadow-md" />
+        <div className="bg-card rounded-lg shadow-md border border-line p-4 h-16 animate-pulse" />
         {[...Array(2)].map((_, i) => (
-          <div key={i} className="bg-card rounded-lg shadow-card p-5 h-64 animate-pulse" />
+          <div key={i} className="bg-card rounded-lg shadow-md border border-line p-5 h-64 animate-pulse" />
         ))}
       </div>
     )
@@ -168,17 +174,18 @@ export default function HistoryPage() {
 
       {/* Filters — only show when there's data */}
       {records.length > 0 && (
-        <div className="flex flex-wrap items-end gap-3 bg-card rounded-lg shadow-card p-4">
+        <div className="flex flex-wrap items-end gap-3 bg-card rounded-lg shadow-md border border-line p-4">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-muted">Year</label>
             <select
               value={filterYear}
               onChange={(e) => {
-                setFilterYear(e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10))
+                const val = e.target.value
+                setFilterYear(val === 'all' ? 'all' : parseInt(val, 10))
                 setFilterFromMonth('all')
                 setFilterToMonth('all')
               }}
-              className="px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none"
+              className="px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none shadow-sm"
             >
               <option value="all">All years</option>
               {allYears.map((y) => (
@@ -191,8 +198,11 @@ export default function HistoryPage() {
             <label className="text-xs font-medium text-muted">From month</label>
             <select
               value={filterFromMonth}
-              onChange={(e) => setFilterFromMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10))}
-              className="px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none"
+              onChange={(e) => {
+                const val = e.target.value
+                setFilterFromMonth(val === 'all' ? 'all' : parseInt(val, 10))
+              }}
+              className="px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none shadow-sm"
             >
               <option value="all">Any</option>
               {MONTHS.map((m, i) => (
@@ -205,8 +215,11 @@ export default function HistoryPage() {
             <label className="text-xs font-medium text-muted">To month</label>
             <select
               value={filterToMonth}
-              onChange={(e) => setFilterToMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10))}
-              className="px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none"
+              onChange={(e) => {
+                const val = e.target.value
+                setFilterToMonth(val === 'all' ? 'all' : parseInt(val, 10))
+              }}
+              className="px-3 py-2 rounded-md text-sm text-header bg-surface border border-line outline-none shadow-sm"
             >
               <option value="all">Any</option>
               {MONTHS.map((m, i) => (
@@ -219,7 +232,7 @@ export default function HistoryPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="px-3 py-2 rounded-md text-sm text-muted hover:text-body border border-line bg-surface transition-colors"
+              className="px-3 py-2 rounded-md text-sm text-muted hover:text-body border border-line bg-surface shadow-sm hover:bg-surface-light transition-all"
             >
               Clear filters
             </button>
@@ -229,12 +242,12 @@ export default function HistoryPage() {
 
       {/* Empty state — no data at all */}
       {records.length === 0 && (
-        <div className="bg-card rounded-lg shadow-card px-5 py-16 text-center">
+        <div className="bg-card rounded-lg shadow-md border border-line px-5 py-16 text-center">
           <p className="text-base font-medium text-body mb-1">No budget history yet.</p>
           <p className="text-sm text-muted mb-5">Create your first budget to get started.</p>
           <Link
             href="/budget/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-md hover:bg-accent-hover transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-md shadow-sm hover:bg-accent-hover transition-colors"
           >
             Create Budget
           </Link>
@@ -255,7 +268,7 @@ export default function HistoryPage() {
           <h2 className="text-5xl font-bold text-header mb-5">{year}</h2>
 
           <div className="flex flex-col gap-5">
-            {monthRecords.map((record) => {
+            {monthRecords.map((record: MonthRecord) => {
               const { budgetMonth, cutoffs, items } = record
               const monthLabel = MONTHS[budgetMonth.month - 1]
               const totalSalary = cutoffs.reduce((sum, c) => sum + Number(c.salary), 0)
@@ -264,14 +277,14 @@ export default function HistoryPage() {
               const isCurrentMonth = budgetMonth.month === currentMonth && budgetMonth.year === currentYear
 
               return (
-                <div key={budgetMonth.id} className={['bg-card rounded-lg shadow-card overflow-hidden', isCurrentMonth ? 'ring-2 ring-accent' : ''].join(' ')}>
+                <div key={budgetMonth.id} className={['bg-card rounded-lg shadow-md border border-line overflow-hidden', isCurrentMonth ? 'ring-2 ring-accent ring-offset-2 ring-offset-card' : ''].join(' ')}>
 
                   {/* Month header */}
                   <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-line">
                     <h3 className="text-base font-semibold text-header flex-1 min-w-0 flex flex-col gap-0.5">
                       <span>{monthLabel} {budgetMonth.year}</span>
                       {isCurrentMonth && (
-                        <span className="inline-flex items-center self-start px-2 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent">
+                        <span className="inline-flex items-center self-start px-2 py-0.5 rounded-sm text-xs font-medium bg-accent-light text-accent shadow-sm">
                           Current
                         </span>
                       )}
@@ -280,7 +293,7 @@ export default function HistoryPage() {
                       <button
                         type="button"
                         onClick={() => handleReuse(budgetMonth.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-body border border-line rounded-md bg-surface hover:border-accent hover:text-accent transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-body border border-line rounded-md bg-surface shadow-sm hover:border-accent hover:text-accent transition-all cursor-pointer"
                       >
                         Reuse
                       </button>
@@ -288,7 +301,7 @@ export default function HistoryPage() {
                         type="button"
                         onClick={() => handleExportPDF(record)}
                         disabled={exportingIds.has(budgetMonth.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-body border border-line rounded-md bg-surface hover:border-accent hover:text-accent transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-body border border-line rounded-md bg-surface shadow-sm hover:border-accent hover:text-accent transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {exportingIds.has(budgetMonth.id) && (
                           <AiOutlineLoading3Quarters className="animate-spin" />
@@ -297,7 +310,7 @@ export default function HistoryPage() {
                       </button>
                       <Link
                         href={`/budget/${budgetMonth.id}/edit`}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-accent border border-accent rounded-md hover:bg-accent-light transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-accent border border-accent rounded-md shadow-sm hover:bg-accent-light transition-all"
                       >
                         Edit
                       </Link>
@@ -316,7 +329,7 @@ export default function HistoryPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {cutoffs.map((cutoff) => {
+                        {cutoffs.map((cutoff: Cutoff) => {
                           const cutoffItems = items.filter((i) => i.cutoff_id === cutoff.id)
                           const cutoffExpenses = cutoffItems.reduce((sum, i) => sum + Number(i.amount), 0)
                           const remaining = Number(cutoff.salary) - cutoffExpenses
@@ -337,14 +350,14 @@ export default function HistoryPage() {
                                 <tr className="border-b border-line-light">
                                   <td colSpan={4} className="px-5 py-3 text-xs text-muted italic">No items</td>
                                 </tr>
-                              ) : cutoffItems.map((item) => (
+                              ) : cutoffItems.map((item: BudgetItem) => (
                                 <tr key={item.id} className="border-b border-line-light">
                                   <td className="px-5 py-3 text-body">{item.name}</td>
                                   <td className="px-5 py-3 text-body font-medium tabular-nums">{formatCurrency(Number(item.amount))}</td>
-                                  <td className="px-5 py-3 text-muted">{formatDate(item.due_date ?? null)}</td>
+                                  <td className="px-5 py-3 text-muted">{formatDate(item.due_date)}</td>
                                   <td className="px-5 py-3">
                                     <span className={[
-                                      'inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium',
+                                      'inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium shadow-sm',
                                       item.status === 'paid'
                                         ? 'bg-paid-bg text-paid'
                                         : 'bg-surface text-muted border border-line',
@@ -395,7 +408,7 @@ export default function HistoryPage() {
 
                   {/* Mobile card list */}
                   <div className="md:hidden flex flex-col gap-4 p-4">
-                    {cutoffs.map((cutoff) => {
+                    {cutoffs.map((cutoff: Cutoff) => {
                       const cutoffItems = items.filter((i) => i.cutoff_id === cutoff.id)
                       const cutoffExpenses = cutoffItems.reduce((sum, i) => sum + Number(i.amount), 0)
                       const remaining = Number(cutoff.salary) - cutoffExpenses
@@ -420,15 +433,15 @@ export default function HistoryPage() {
                             <p className="text-xs text-muted italic py-2">No items</p>
                           ) : (
                             <div className="flex flex-col gap-2 mb-3">
-                              {cutoffItems.map((item) => (
+                              {cutoffItems.map((item: BudgetItem) => (
                                 <div
                                   key={item.id}
-                                  className="bg-surface rounded-md px-3 py-2.5 flex items-start justify-between gap-2"
+                                  className="bg-surface rounded-md px-3 py-2.5 flex items-start justify-between gap-2 shadow-sm border border-line"
                                 >
                                   <div className="flex flex-col gap-0.5 min-w-0">
                                     <span className="text-sm font-medium text-body truncate">{item.name}</span>
                                     {item.due_date && (
-                                      <span className="text-xs text-muted">Due {formatDate(item.due_date ?? null)}</span>
+                                      <span className="text-xs text-muted">Due {formatDate(item.due_date)}</span>
                                     )}
                                   </div>
                                   <div className="flex flex-col items-end gap-1 shrink-0">
@@ -436,7 +449,7 @@ export default function HistoryPage() {
                                       {formatCurrency(Number(item.amount))}
                                     </span>
                                     <span className={[
-                                      'inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium',
+                                      'inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium shadow-sm',
                                       item.status === 'paid'
                                         ? 'bg-paid-bg text-paid'
                                         : 'bg-card text-muted border border-line',
@@ -450,7 +463,7 @@ export default function HistoryPage() {
                           )}
 
                           {/* Cutoff summary */}
-                          <div className="flex gap-3 rounded-md bg-surface px-3 py-2">
+                          <div className="flex gap-3 rounded-md bg-surface px-3 py-2 shadow-sm border border-line">
                             <div className="flex-1">
                               <p className="text-xs text-muted mb-0.5">Total Expenses</p>
                               <p className="text-sm font-semibold text-body tabular-nums">{formatCurrency(cutoffExpenses)}</p>
@@ -468,7 +481,7 @@ export default function HistoryPage() {
                     })}
 
                     {/* Monthly total card */}
-                    <div className="rounded-md border border-line bg-surface px-3 py-3 flex flex-col gap-1.5">
+                    <div className="rounded-md border border-line bg-surface px-3 py-3 flex flex-col gap-1.5 shadow-sm">
                       <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-1">Monthly Total</p>
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-muted">Total Salary</span>

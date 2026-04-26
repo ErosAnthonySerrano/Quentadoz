@@ -63,7 +63,7 @@ export default function EditBudgetPage() {
   if (loadState === 'loading') {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-card rounded-lg shadow-card p-5 h-40 animate-pulse" />
+        <div className="bg-card rounded-lg shadow-md border border-line p-5 h-40 animate-pulse" />
       </div>
     )
   }

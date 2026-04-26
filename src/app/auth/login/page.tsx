@@ -71,7 +71,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-svh flex items-center justify-center py-6 px-4 bg-page">
-      <div className="w-full max-w-sm bg-card rounded-lg shadow-card border border-line px-8 py-10 flex flex-col gap-5">
+      <div className="w-full max-w-sm bg-card rounded-lg shadow-md border border-line px-8 py-10 flex flex-col gap-5">
         <div className="flex flex-col items-center gap-1">
           <BrandLogo width={180} />
           <p className="text-sm text-muted">Welcome back</p>
@@ -80,7 +80,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleLogin}
           disabled={oauthLoading || isSubmitting}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-5 rounded-md border border-line bg-secondary text-body text-sm font-medium cursor-pointer transition-colors hover:bg-surface disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 w-full py-2.5 px-5 rounded-md border border-line bg-secondary text-body text-sm font-medium cursor-pointer transition-all shadow-sm hover:bg-surface active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {oauthLoading ? (
             <span className="inline-block w-3.5 h-3.5 border-2 border-body/20 border-t-body rounded-full animate-spin" />
@@ -103,32 +103,34 @@ export default function LoginPage() {
             autoComplete="email"
             error={errors.email?.message}
             {...register('email')}
+            className="shadow-sm"
           />
           <PasswordInput
             label="Password"
             autoComplete="current-password"
             error={errors.password?.message}
             {...register('password')}
+            className="shadow-sm"
           />
 
           <div className="flex justify-end -mt-2">
-            <Link href="/auth/forgot-password" className="text-xs text-accent font-medium no-underline">
+            <Link href="/auth/forgot-password" className="text-xs text-accent font-medium no-underline hover:underline">
               Forgot password?
             </Link>
           </div>
 
           {serverError && (
-            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm">{serverError}</p>
+            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm border border-due-danger shadow-sm">{serverError}</p>
           )}
 
-          <Button type="submit" fullWidth loading={isSubmitting} disabled={oauthLoading}>
+          <Button type="submit" fullWidth loading={isSubmitting} disabled={oauthLoading} className="shadow-sm active:scale-95 transition-all">
             Sign In
           </Button>
         </form>
 
         <p className="text-center text-xs text-muted">
           Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" className="text-accent font-medium no-underline">
+          <Link href="/auth/signup" className="text-accent font-medium no-underline hover:underline">
             Sign up
           </Link>
         </p>

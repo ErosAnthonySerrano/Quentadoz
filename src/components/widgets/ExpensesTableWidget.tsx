@@ -17,12 +17,12 @@ interface Props {
 
 export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatus, budgetMonthId }: Props) {
   return (
-    <div className="bg-card rounded-lg shadow-card p-6">
+    <div className="bg-card rounded-lg shadow-md shadow-black/20 border border-line p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">Expenses</h3>
         <Link
           href={`/budget/${budgetMonthId}/edit`}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-accent bg-accent-light hover:bg-accent hover:text-white transition-colors no-underline"
+          className="flex items-center gap-1.5 px-3 py-1.5 shadow-sm rounded-md text-xs font-medium text-accent-light bg-accent hover:bg-accent hover:text-white transition-all active:scale-95 no-underline"
         >
           <HiOutlinePencilSquare size={13} />
           Edit Budget
@@ -73,10 +73,10 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                             const isPaid = item.status === 'paid'
                             return (
                               <tr key={item.id} className={isPaid ? '' : cls.row}>
-                                <td className={`px-3 py-3 border-b border-line-light font-medium ${isPaid ? 'text-muted' : cls.text}`}>
+                                <td className={`px-3 py-3 border-b border-line-light font-medium text-muted`}>
                                   {item.name}
                                 </td>
-                                <td className={`px-3 py-3 border-b border-line-light ${isPaid ? 'text-muted' : cls.text}`}>
+                                <td className={`px-3 py-3 border-b border-line-light text-muted`}>
                                   {formatCurrency(item.amount)}
                                 </td>
                                 <td className={`px-3 py-3 border-b border-line-light ${isPaid ? 'text-muted' : cls.text}`}>
@@ -85,7 +85,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                                 <td className="px-3 py-3 border-b border-line-light">
                                   <span
                                     className={[
-                                      'inline-flex px-2.5 py-0.5 rounded-sm text-xs font-medium',
+                                      'inline-flex px-2.5 py-0.5 rounded-sm text-xs font-medium shadow-sm',
                                       item.status === 'paid' ? 'bg-paid-bg text-paid' : 'bg-surface text-muted',
                                     ].join(' ')}
                                   >
@@ -119,12 +119,11 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                           <div
                             key={item.id}
                             className={[
-                              'rounded-md p-3 border border-line-light',
-                              isPaid ? 'bg-surface' : cls.row,
+                              'rounded-md p-3 border border-line shadow-sm'
                             ].join(' ')}
                           >
                             <div className="flex items-start justify-between gap-2 mb-1.5">
-                              <span className={`text-sm font-medium leading-snug ${isPaid ? 'text-muted' : cls.text}`}>
+                              <span className={`text-sm font-medium leading-snug text-muted`}>
                                 {item.name}
                               </span>
                               <span
@@ -137,7 +136,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                               </span>
                             </div>
                             <div className="flex items-center gap-2 mb-2.5">
-                              <span className={`text-sm font-semibold ${isPaid ? 'text-muted' : cls.text}`}>
+                              <span className={`text-sm font-semibold text-muted`}>
                                 {formatCurrency(item.amount)}
                               </span>
                               {item.due_date && (
@@ -171,4 +170,3 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
     </div>
   )
 }
-

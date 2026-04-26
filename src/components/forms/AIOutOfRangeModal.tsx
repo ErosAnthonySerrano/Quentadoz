@@ -29,7 +29,7 @@ export function AIOutOfRangeModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-lg shadow-card p-6 w-full max-w-md">
+      <div className="bg-card rounded-lg shadow-md border border-line p-6 w-full max-w-md">
         <div className="flex items-start gap-3 mb-5">
           <div className="shrink-0 mt-0.5 w-8 h-8 rounded-full bg-due-warning-bg flex items-center justify-center">
             <HiOutlineExclamationTriangle size={16} className="text-due-warning" />

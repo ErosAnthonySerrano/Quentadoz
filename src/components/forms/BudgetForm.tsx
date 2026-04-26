@@ -727,7 +727,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
   if (reuseLoading) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-card rounded-lg shadow-card p-8 flex flex-col items-center gap-3">
+        <div className="bg-card rounded-lg shadow-md border border-line p-8 flex flex-col items-center gap-3">
           <span className="inline-block w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
           <p className="text-sm text-muted">Loading budget to reuse…</p>
         </div>
@@ -745,7 +745,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
 
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-card rounded-lg shadow-card p-8">
+        <div className="bg-card rounded-lg shadow-md border border-line p-8">
           <h2 className="text-xl font-semibold text-header mb-1">
             How many salary cutoffs do you have this month?
           </h2>
@@ -758,9 +758,9 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
                 type="button"
                 onClick={() => { setCutoffCount(n); setCustomCount('') }}
                 className={[
-                  'w-14 h-14 rounded-lg text-lg font-semibold border transition-colors',
+                  'w-14 h-14 rounded-lg text-lg font-semibold border transition-all shadow-md',
                   cutoffCount === n && !customCount
-                    ? 'bg-accent text-white border-accent'
+                    ? 'bg-accent text-white border-accent shadow-accent/20'
                     : 'bg-surface text-body border-line hover:border-accent',
                 ].join(' ')}
               >
@@ -781,9 +781,10 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
                 const val = parseInt(e.target.value, 10)
                 if (!isNaN(val) && val >= 5 && val <= 31) setCutoffCount(val)
               }}
+              onFocus={(e) => e.target.select()}
               placeholder="5+"
               className={[
-                'w-20 px-3 py-2 rounded-md text-sm text-header bg-surface border outline-none',
+                'w-20 px-3 py-2 rounded-md text-sm text-header bg-surface border outline-none shadow-md transition-all focus:border-accent',
                 overLimit ? 'border-due-danger' : 'border-line',
               ].join(' ')}
             />
@@ -799,7 +800,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
             <div className="flex flex-col gap-3 mb-6">
               {/* Previous month */}
               <div
-                className="border border-line-light rounded-lg p-4 bg-surface cursor-pointer"
+                className="border border-line rounded-lg p-4 bg-surface cursor-pointer shadow-md hover:border-accent transition-all"
                 onClick={async () => { setPrevExpanded(true); await checkPreviousBudget() }}
               >
                 <p className="text-sm font-medium text-body mb-1">Reuse last month&apos;s budget</p>
@@ -833,7 +834,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
 
               {/* Current month */}
               <div
-                className="border border-line-light rounded-lg p-4 bg-surface cursor-pointer"
+                className="border border-line rounded-lg p-4 bg-surface cursor-pointer shadow-md hover:border-accent transition-all"
                 onClick={async () => { setCurrExpanded(true); await checkPreviousBudget() }}
               >
                 <p className="text-sm font-medium text-body mb-1">Reuse this month&apos;s current budget</p>
@@ -891,7 +892,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
       <div className="max-w-4xl mx-auto">
       <form onSubmit={handleSubmit(() => setStep(3))} noValidate>
         {/* Month/Year selector */}
-        <div className="bg-card rounded-lg shadow-card p-5 mb-5">
+        <div className="bg-card rounded-lg shadow-md border border-line p-5 mb-5">
           <h2 className="text-xl font-semibold text-header mb-4">Budget Month</h2>
           <div className="grid grid-cols-2 gap-4 max-w-sm">
             <div className="flex flex-col gap-1">
@@ -900,7 +901,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
                 value={currentMonth}
                 onChange={(e) => setValue('month', parseInt(e.target.value, 10))}
                 disabled={mode === 'edit'}
-                className="w-full px-3 py-3 rounded-md text-sm text-header bg-surface outline-none transition-colors border border-line disabled:opacity-60"
+                className="w-full px-3 py-3 rounded-md text-sm text-header bg-surface outline-none transition-all border border-line shadow-sm focus:border-accent disabled:opacity-60"
               >
                 {MONTHS.map((m, i) => (
                   <option key={m} value={i + 1}>{m}</option>
@@ -913,8 +914,9 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
                 type="number"
                 value={currentYear}
                 onChange={(e) => setValue('year', parseInt(e.target.value, 10))}
+                onFocus={(e) => e.target.select()}
                 disabled={mode === 'edit'}
-                className="w-full px-3 py-3 rounded-md text-sm text-header bg-surface outline-none transition-colors border border-line disabled:opacity-60"
+                className="w-full px-3 py-3 rounded-md text-sm text-header bg-surface outline-none transition-all border border-line shadow-sm focus:border-accent disabled:opacity-60"
               />
             </div>
           </div>
@@ -922,7 +924,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
 
         {/* Global AI scan — only shown when there are multiple cutoffs */}
         {cutoffFields.length > 1 && (
-          <div className="bg-card rounded-lg shadow-card p-5 mb-5 flex items-center justify-between gap-4">
+          <div className="bg-card rounded-lg shadow-md border border-line p-5 mb-5 flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-header">Scan entire budget with AI</p>
               <p className="text-xs text-muted mt-0.5">Upload one document that covers all your cutoffs — items will be routed automatically.</p>
@@ -1043,7 +1045,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
   return (
     <div className="max-w-4xl mx-auto">
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="bg-card rounded-lg shadow-card p-5 mb-5">
+      <div className="bg-card rounded-lg shadow-md border border-line p-5 mb-5">
         <h2 className="text-xl font-semibold text-header mb-1">Review Budget</h2>
         <p className="text-sm text-muted">
           {MONTHS[formValues.month - 1]} {formValues.year}
@@ -1054,7 +1056,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
         const cutoffExpenses = cutoff.items.reduce((sum, item) => sum + Number(item.amount), 0)
         const remaining = Number(cutoff.salary) - cutoffExpenses
         return (
-          <div key={i} className="bg-card rounded-lg shadow-card p-5 mb-4">
+          <div key={i} className="bg-card rounded-lg shadow-md border border-line p-5 mb-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-semibold text-header">{ordinalLabel(i + 1)}</h3>
               <div className="text-sm text-muted">
@@ -1095,7 +1097,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
       })}
 
       {/* Monthly summary */}
-      <div className="bg-card rounded-lg shadow-card p-5 mb-6">
+      <div className="bg-card rounded-lg shadow-md border border-line p-5 mb-6">
         <h3 className="text-base font-semibold text-header mb-3">Monthly Summary</h3>
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex justify-between">
