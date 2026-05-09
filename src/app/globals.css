@@ -79,7 +79,7 @@
 /* ─── Dark Mode Overrides ────────────────────────────────── */
 [data-theme="dark"] {
   /* Backgrounds */
-  --color-page:           #191919;
+  --color-page:           #091422;
   --color-secondary:      #0E2036;
   --color-card:           #0E2036;
   --color-surface:        #162B40;
@@ -181,7 +181,7 @@ body.transitions-ready {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-lg);
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  @apply shadow-md;
 }
 
 /* ─── Component: Dashboard Chip ─────────────────────────── */
