@@ -4,8 +4,8 @@
     "description": "Personal budgeting app",
     "start_url": "/dashboard",
     "display": "standalone",
-    "background_color": "#f3f7ff",
-    "theme_color": "#2b6aff",
+    "background_color": "#0e2036",
+    "theme_color": "#0e2036",
     "orientation": "portrait",
     "icons": [
         {

@@ -18,20 +18,20 @@ function WaveBackgroundDark() {
       >
         <defs>
           <linearGradient id="wg-dark" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0" />
-            <stop offset="8%" stopColor="#22d3ee" stopOpacity="1" />
-            <stop offset="40%" stopColor="#3b82f6" stopOpacity="1" />
-            <stop offset="70%" stopColor="#8b5cf6" stopOpacity="1" />
-            <stop offset="90%" stopColor="#ec4899" stopOpacity="1" />
-            <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
+            <stop offset="0%" stopColor="#13AE83" stopOpacity="0" />
+            <stop offset="8%" stopColor="#13AE83" stopOpacity="1" />
+            <stop offset="40%" stopColor="#0BCFA0" stopOpacity="1" />
+            <stop offset="70%" stopColor="#5DD8B8" stopOpacity="1" />
+            <stop offset="90%" stopColor="#0E2036" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#0E2036" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="wg-hi-dark" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#a5f3fc" stopOpacity="0" />
-            <stop offset="10%" stopColor="#a5f3fc" stopOpacity="0.9" />
-            <stop offset="42%" stopColor="#bfdbfe" stopOpacity="1" />
-            <stop offset="72%" stopColor="#ddd6fe" stopOpacity="0.9" />
-            <stop offset="92%" stopColor="#fbcfe8" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#fbcfe8" stopOpacity="0" />
+            <stop offset="0%" stopColor="#13AE83" stopOpacity="0" />
+            <stop offset="10%" stopColor="#13AE83" stopOpacity="0.72" />
+            <stop offset="42%" stopColor="#0BCFA0" stopOpacity="0.95" />
+            <stop offset="72%" stopColor="#5DD8B8" stopOpacity="0.85" />
+            <stop offset="92%" stopColor="#B8CCCA" stopOpacity="0.42" />
+            <stop offset="100%" stopColor="#B8CCCA" stopOpacity="0" />
           </linearGradient>
           <filter id="wave-glow-a-dark" x="-10%" y="-500%" width="120%" height="1100%">
             <feGaussianBlur stdDeviation="22" />
@@ -96,20 +96,20 @@ function WaveBackgroundLight() {
       >
         <defs>
           <linearGradient id="wg-light" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#dbeafe" stopOpacity="0" />
-            <stop offset="8%" stopColor="#dbeafe" stopOpacity="0.42" />
-            <stop offset="40%" stopColor="#bfdbfe" stopOpacity="0.35" />
-            <stop offset="70%" stopColor="#ddd6fe" stopOpacity="0.28" />
-            <stop offset="90%" stopColor="#fbcfe8" stopOpacity="0.16" />
-            <stop offset="100%" stopColor="#fbcfe8" stopOpacity="0" />
+            <stop offset="0%" stopColor="#13AE83" stopOpacity="0" />
+            <stop offset="8%" stopColor="#13AE83" stopOpacity="0.4" />
+            <stop offset="40%" stopColor="#0BCFA0" stopOpacity="0.3" />
+            <stop offset="70%" stopColor="#0E2036" stopOpacity="0.2" />
+            <stop offset="90%" stopColor="#0E2036" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="#0E2036" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="wg-hi-light" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#f8fafc" stopOpacity="0" />
-            <stop offset="10%" stopColor="#e0f2fe" stopOpacity="0.55" />
-            <stop offset="42%" stopColor="#dbeafe" stopOpacity="0.7" />
-            <stop offset="72%" stopColor="#ede9fe" stopOpacity="0.5" />
-            <stop offset="92%" stopColor="#fce7f3" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#fce7f3" stopOpacity="0" />
+            <stop offset="0%" stopColor="#F8F8F8" stopOpacity="0" />
+            <stop offset="10%" stopColor="#C8EDE3" stopOpacity="0.5" />
+            <stop offset="42%" stopColor="#13AE83" stopOpacity="0.62" />
+            <stop offset="72%" stopColor="#0BCFA0" stopOpacity="0.4" />
+            <stop offset="92%" stopColor="#0E2036" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="#0E2036" stopOpacity="0" />
           </linearGradient>
           <filter id="wave-glow-a-light" x="-10%" y="-500%" width="120%" height="1100%">
             <feGaussianBlur stdDeviation="18" />
@@ -169,28 +169,28 @@ export function PageBackground() {
         className="absolute inset-0 theme-light-only"
         style={{
           background:
-            'radial-gradient(600px 380px at 15% 10%, rgba(123, 167, 255, 0.14), transparent 60%), radial-gradient(520px 340px at 82% 12%, rgba(166, 120, 255, 0.09), transparent 62%), linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,248,255,0.98) 34%, rgba(243,247,255,1) 100%)',
+            'radial-gradient(600px 380px at 15% 10%, rgba(19, 174, 131, 0.16), transparent 60%), radial-gradient(520px 340px at 82% 12%, rgba(14, 32, 54, 0.08), transparent 62%), linear-gradient(180deg, rgba(248, 248, 248, 0.92), rgba(237, 247, 243, 0.98) 34%, rgba(248, 255, 254, 1) 100%)',
         }}
       />
       <div
         className="absolute inset-0 opacity-40 theme-light-only"
         style={{
           background:
-            'radial-gradient(220px 220px at 50% 0%, rgba(80, 194, 255, 0.1), transparent 68%), radial-gradient(160px 160px at 7% 7%, rgba(94, 135, 255, 0.08), transparent 72%)',
+            'radial-gradient(220px 220px at 50% 0%, rgba(11, 207, 160, 0.12), transparent 68%), radial-gradient(160px 160px at 7% 7%, rgba(14, 32, 54, 0.07), transparent 72%)',
         }}
       />
       <div
         className="absolute inset-0 theme-dark-only"
         style={{
           background:
-            'radial-gradient(720px 420px at 15% 10%, rgba(33, 72, 181, 0.35), transparent 58%), radial-gradient(600px 360px at 84% 12%, rgba(123, 67, 255, 0.22), transparent 60%), linear-gradient(180deg, rgba(7, 10, 33, 0.94), rgba(6, 8, 25, 0.98) 34%, rgba(5, 8, 25, 1) 100%)',
+            'radial-gradient(720px 420px at 15% 10%, rgba(19, 174, 131, 0.26), transparent 58%), radial-gradient(600px 360px at 84% 12%, rgba(11, 207, 160, 0.18), transparent 60%), linear-gradient(180deg, rgba(14, 32, 54, 0.96), rgba(12, 26, 43, 0.99) 34%, rgba(25, 25, 25, 1) 100%)',
         }}
       />
       <div
         className="absolute inset-0 opacity-60 theme-dark-only"
         style={{
           background:
-            'radial-gradient(240px 240px at 50% 0%, rgba(80, 194, 255, 0.12), transparent 68%), radial-gradient(160px 160px at 7% 7%, rgba(126, 67, 255, 0.1), transparent 72%)',
+            'radial-gradient(240px 240px at 50% 0%, rgba(11, 207, 160, 0.14), transparent 68%), radial-gradient(160px 160px at 7% 7%, rgba(93, 216, 184, 0.12), transparent 72%)',
         }}
       />
 

@@ -28,16 +28,16 @@ function ordinalLabel(n: number): string {
 
 // ─── Color tokens ─────────────────────────────────────────────────────────────
 
-const ACCENT    = '#2A6E4E'
-const LIGHT_GRAY = '#F1EFE9'
-const ALT_ROW   = '#F8F7F4'
-const WHITE     = '#FFFFFF'
-const DARK      = '#1a1917'
-const BODY      = '#4a4945'
-const MUTED     = '#8a8880'
-const DANGER    = '#c0392b'
-const SAFE      = '#2a6e4e'
-const BORDER    = '#e4e2db'
+const ACCENT     = '#13AE83'
+const LIGHT_GRAY = '#F1F5F4'
+const ALT_ROW    = '#F8FFFE'
+const WHITE      = '#FFFFFF'
+const DARK       = '#0E2036'
+const BODY       = '#2B3E52'
+const MUTED      = '#6B7E8F'
+const DANGER     = '#D24747'
+const SAFE       = '#13AE83'
+const BORDER     = '#D4E8E1'
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -53,9 +53,8 @@ const styles = StyleSheet.create({
   },
 
   // Header
-  headerRow:   { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  logo:        { width: 32, height: 32, marginRight: 10 },
-  appName:     { fontSize: 20, fontFamily: 'Helvetica-Bold', color: ACCENT },
+  headerRow:   { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  logo:        { width: 140 },
   monthTitle:  { fontSize: 13, fontFamily: 'Helvetica-Bold', color: DARK, marginBottom: 3 },
   generatedOn: { fontSize: 9, color: MUTED, marginBottom: 14 },
   divider:     { borderBottomWidth: 1, borderBottomColor: BORDER, marginBottom: 16 },
@@ -186,7 +185,6 @@ export function MonthPDFDocument({ data }: { data: MonthPDFData }) {
         {/* ── Header ──────────────────────────────────────────────────────── */}
         <View style={styles.headerRow}>
           <Image src={logoUrl} style={styles.logo} />
-          <Text style={styles.appName}>Quentadoz</Text>
         </View>
         <Text style={styles.monthTitle}>{monthLabel} {budgetMonth.year} Budget Summary</Text>
         <Text style={styles.generatedOn}>Generated on {generatedDate}</Text>
@@ -286,7 +284,7 @@ export function MonthPDFDocument({ data }: { data: MonthPDFData }) {
 
 export async function exportMonthPDF(data: Omit<MonthPDFData, 'logoUrl'>): Promise<void> {
   const monthLabel = MONTH_NAMES[data.budgetMonth.month - 1]
-  const logoUrl = window.location.origin + '/Quentadoz%20Main%20Logo.png'
+  const logoUrl = window.location.origin + '/Quentadoz%20Main%20Logo%20Light.png'
   const blob = await reactPdf(<MonthPDFDocument data={{ ...data, logoUrl }} />).toBlob()
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')

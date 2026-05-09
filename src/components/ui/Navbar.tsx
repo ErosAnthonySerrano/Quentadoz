@@ -70,7 +70,13 @@ export function Navbar() {
           />
         </>
       ) : (
-        <div className="h-full w-full flex items-center justify-center bg-[radial-gradient(circle_at_30%_30%,rgba(123,167,255,0.28),transparent_40%),radial-gradient(circle_at_70%_30%,rgba(166,120,255,0.24),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.94),rgba(237,242,255,0.98))] text-header text-xs font-semibold">
+        <div
+          className="h-full w-full flex items-center justify-center text-header text-xs font-semibold"
+          style={{
+            background:
+              'radial-gradient(circle at 30% 30%, rgba(19, 174, 131, 0.26), transparent 40%), radial-gradient(circle at 70% 30%, rgba(14, 32, 54, 0.18), transparent 42%), linear-gradient(180deg, rgba(248, 248, 248, 0.96), rgba(223, 246, 238, 0.98))',
+          }}
+        >
           {profileAvatarLabel}
         </div>
       )}
@@ -80,20 +86,48 @@ export function Navbar() {
   return (
     <>
       {/* Mobile top header */}
-      <header className="md:hidden fixed top-0 inset-x-0 z-100 bg-card border-b border-line flex items-center px-4 h-12">
+      <header className="md:hidden fixed top-0 inset-x-0 z-100 bg-card border-b border-line flex items-center px-4 h-14">
         <Link href="/dashboard" className="flex items-center gap-2 no-underline">
-          <Image src="/Quentadoz%20Main%20Logo.png" alt="Quentadoz" width={26} height={26} className="object-contain" style={{ height: 'auto' }} />
-          <span className="text-base font-semibold text-header">Quentadoz</span>
+          <Image
+            src="/Quentadoz%20Main%20Logo%20Light.png"
+            alt="Quentadoz"
+            width={110}
+            height={28}
+            className="object-contain theme-light-only"
+            style={{ height: 'auto' }}
+          />
+          <Image
+            src="/Quentadoz%20Main%20Logo%20Dark.png"
+            alt="Quentadoz"
+            width={110}
+            height={28}
+            className="object-contain theme-dark-only"
+            style={{ height: 'auto' }}
+          />
         </Link>
       </header>
 
       {/* Desktop top navbar */}
       <header className="navbar-desktop hidden fixed top-0 inset-x-0 z-100 bg-card border-b border-line shadow-md">
-        <div className="max-w-screen-xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-screen-xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2 no-underline">
-              <Image src="/Quentadoz%20Main%20Logo.png" alt="Quentadoz" width={28} height={28} className="object-contain" style={{ height: 'auto' }} />
-              <span className="text-base font-semibold text-header">Quentadoz</span>
+              <Image
+                src="/Quentadoz%20Main%20Logo%20Light.png"
+                alt="Quentadoz"
+                width={132}
+                height={34}
+                className="object-contain theme-light-only"
+                style={{ height: 'auto' }}
+              />
+              <Image
+                src="/Quentadoz%20Main%20Logo%20Dark.png"
+                alt="Quentadoz"
+                width={132}
+                height={34}
+                className="object-contain theme-dark-only"
+                style={{ height: 'auto' }}
+              />
             </Link>
             <nav className="flex items-center gap-1">
               {navItems.map(({ href, icon: Icon, label }) => (

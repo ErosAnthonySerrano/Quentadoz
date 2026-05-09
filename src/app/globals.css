@@ -1,153 +1,197 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap");
 
 @theme {
+  /* ─── Fonts ──────────────────────────────────────────── */
+  --font-primary: "Nunito", "Segoe UI", system-ui, sans-serif;
+  --font-secondary: "Montserrat", "Segoe UI", system-ui, sans-serif;
+
+  /* ─── Brand Palette (from brand kit) ────────────────── */
+  /* #0E2036 · Deep Navy    — primary dark / nav / headings  */
+  /* #13AE83 · Teal Green   — accent / CTA / highlights      */
+  /* #F8F8F8 · Off-White    — light mode background          */
+  /* #191919 · Near-Black   — dark mode background           */
+
+  /* ─── Backgrounds (Light) ───────────────────────────── */
+  --color-page:           #F8F8F8;
+  --color-secondary:      #FFFFFF;
+  --color-card:           #FFFFFF;
+  --color-surface:        #F1F5F4;
+  --color-panel-glow:     #C8EDE3;
+  --color-page-grad-a:    #EDF7F3;
+  --color-page-grad-b:    #F8FFFE;
+  --color-page-grad-c:    #EEF9F5;
+  --color-wave-a:         #13AE83;
+  --color-wave-b:         #0E2036;
+  --color-wave-c:         #0BCFA0;
+
+  /* ─── Text ───────────────────────────────────────────── */
+  --color-header:         #0E2036;
+  --color-title:          #0E2036;
+  --color-body:           #2B3E52;
+  --color-muted:          #6B7E8F;
+
+  /* ─── Accent / Brand Green ───────────────────────────── */
+  --color-accent:         #13AE83;
+  --color-accent-hover:   #0F9270;
+  --color-accent-light:   #E9F2F0;
+  --color-ring-track:     #B8E8D8;
+  --color-ring-progress-a:#13AE83;
+  --color-ring-progress-b:#0E2036;
+  --color-savings-bar:    #0E2036;
+
+  /* ─── Status Badges ──────────────────────────────────── */
+  --color-paid:           #13AE83;
+  --color-paid-bg:        #E6F1EE;
+  --color-unpaid:         #D24747;
+  --color-unpaid-bg:      #FFE4E4;
+
+  /* ─── Due Status ─────────────────────────────────────── */
+  --color-due-safe:       #13AE83;
+  --color-due-safe-bg:    #DFF6EE;
+  --color-due-medium:     #2B7FFF;
+  --color-due-medium-bg:  #E4F0FF;
+  --color-due-warning:    #EFAB2F;
+  --color-due-warning-bg: #FFF3DB;
+  --color-due-danger:     #FF5A57;
+  --color-due-danger-bg:  #FFE3E3;
+
+  /* ─── Borders ────────────────────────────────────────── */
+  --color-line:           #D4E8E1;
+  --color-line-light:     #E8F5F0;
+
+  /* ─── Radius ─────────────────────────────────────────── */
+  --radius-sm:            6px;
+  --radius-md:            10px;
+  --radius-lg:            14px;
+
+  /* ─── Shadows ────────────────────────────────────────── */
+  --shadow-card:          0 10px 25px rgba(14, 32, 54, 0.08), 0 0 0 1px rgba(14, 32, 54, 0.06);
+
+  /* ─── Expense Icon Chips ─────────────────────────────── */
+  --color-chip-transport-bg:      #0E2036;
+  --color-chip-loan-bg:           #2B7FFF;
+  --color-chip-food-bg:           #FF9C27;
+  --color-chip-entertainment-bg:  #D24747;
+  --color-chip-default-bg:        #13AE83;
+}
+
+/* ─── Dark Mode Overrides ────────────────────────────────── */
+[data-theme="dark"] {
   /* Backgrounds */
-  --color-page: #f3f7ff;
-  --color-secondary: #fbfdff;
-  --color-card: #ffffff;
-  --color-surface: #f6f9ff;
-  --color-panel-glow: #dbe5ff;
-  --color-page-grad-a: #edf2ff;
-  --color-page-grad-b: #f8fbff;
-  --color-page-grad-c: #eff4ff;
-  --color-wave-a: #2b84ff;
-  --color-wave-b: #7f3dff;
-  --color-wave-c: #19c7c5;
+  --color-page:           #191919;
+  --color-secondary:      #0E2036;
+  --color-card:           #0E2036;
+  --color-surface:        #162B40;
+  --color-panel-glow:     #0A3D2C;
+  --color-page-grad-a:    #0B1D2E;
+  --color-page-grad-b:    #191919;
+  --color-page-grad-c:    #0D2132;
+  --color-wave-a:         #13AE83;
+  --color-wave-b:         #0BCFA0;
+  --color-wave-c:         #5DD8B8;
 
   /* Text */
-  --color-header: #0f1635;
-  --color-title: #202850;
-  --color-body: #3c4775;
-  --color-muted: #7481ab;
+  --color-header:         #F8F8F8;
+  --color-title:          #E8F5F0;
+  --color-body:           #B8CCCA;
+  --color-muted:          #6B8C87;
 
   /* Accent */
-  --color-accent: #2b6aff;
-  --color-accent-hover: #1552e3;
-  --color-accent-light: #e8f0ff;
-  --color-ring-track: #d8e2ff;
-  --color-ring-progress-a: #2a8dff;
-  --color-ring-progress-b: #8b39ff;
+  --color-accent:         #13AE83;
+  --color-accent-hover:   #0BCFA0;
+  --color-accent-light:   #173040;
+  --color-ring-track:     #1A4035;
+  --color-ring-progress-a:#13AE83;
+  --color-ring-progress-b:#5DD8B8;
+  --color-savings-bar:    #6E8EA6;
 
   /* Status badges */
-  --color-paid: #14a463;
-  --color-paid-bg: #d6f7e7;
-  --color-unpaid: #d24747;
-  --color-unpaid-bg: #ffe4e4;
+  --color-paid:           #0BCFA0;
+  --color-paid-bg:        #132C3A;
+  --color-unpaid:         #FF5F5F;
+  --color-unpaid-bg:      #47171D;
 
   /* Due status */
-  --color-due-safe: #20bb74;
-  --color-due-safe-bg: #d5f9e9;
-  --color-due-medium: #2f90ff;
-  --color-due-medium-bg: #e4f0ff;
-  --color-due-warning: #efab2f;
-  --color-due-warning-bg: #fff3db;
-  --color-due-danger: #ff5a57;
-  --color-due-danger-bg: #ffe3e3;
+  --color-due-safe:       #0BCFA0;
+  --color-due-safe-bg:    #063D27;
+  --color-due-medium:     #38BBFF;
+  --color-due-medium-bg:  #102B55;
+  --color-due-warning:    #F7BC43;
+  --color-due-warning-bg: #3A2A0E;
+  --color-due-danger:     #FF5F5F;
+  --color-due-danger-bg:  #3A141D;
 
   /* Borders */
-  --color-line: #d8e4ff;
-  --color-line-light: #e8efff;
-
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --color-line:           #1E3D4F;
+  --color-line-light:     #162B3D;
 
   /* Shadows */
-  --shadow-card: 0 10px 25px rgba(25, 40, 90, 0.08), 0 0 0 1px rgba(19, 40, 92, 0.06);
+  --shadow-card:          0 24px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(19, 174, 131, 0.18);
 
-  /* Expense icon chips */
-  --color-chip-transport-bg: #0f7aff;
-  --color-chip-loan-bg: #7f47ff;
-  --color-chip-food-bg: #ff9c27;
-  --color-chip-entertainment-bg: #db2e2e;
-  --color-chip-default-bg: #5a67d8;
+  /* Chips */
+  --color-chip-transport-bg:      #1A4A6B;
+  --color-chip-loan-bg:           #1C5080;
+  --color-chip-food-bg:           #CC7A1F;
+  --color-chip-entertainment-bg:  #A83535;
+  --color-chip-default-bg:        #0F8A65;
 }
 
-/* Dark mode overrides */
-[data-theme="dark"] {
-  --color-page: #050819;
-  --color-secondary: #0b1230;
-  --color-card: #0c1538;
-  --color-surface: #16204c;
-  --color-panel-glow: #1a2c73;
-  --color-page-grad-a: #17135a;
-  --color-page-grad-b: #090f2a;
-  --color-page-grad-c: #050819;
-  --color-wave-a: #12a9ff;
-  --color-wave-b: #7b35ff;
-  --color-wave-c: #ff376f;
-
-  --color-header: #eff3ff;
-  --color-title: #d9e0ff;
-  --color-body: #b6c3ef;
-  --color-muted: #7f8cbc;
-
-  --color-accent: #7a43ff;
-  --color-accent-hover: #8d5bff;
-  --color-accent-light: #2f1d6c;
-  --color-ring-track: #2a3568;
-  --color-ring-progress-a: #32d2ff;
-  --color-ring-progress-b: #7a43ff;
-
-  --color-paid: #2de28d;
-  --color-paid-bg: #083d2a;
-  --color-unpaid: #ff5f5f;
-  --color-unpaid-bg: #47171d;
-
-  --color-due-safe: #2de28d;
-  --color-due-safe-bg: #083d2a;
-  --color-due-medium: #38bbff;
-  --color-due-medium-bg: #102b55;
-  --color-due-warning: #f7bc43;
-  --color-due-warning-bg: #3a2a0e;
-  --color-due-danger: #ff5f5f;
-  --color-due-danger-bg: #3a141d;
-
-  --color-line: #2e3d75;
-  --color-line-light: #233262;
-  --shadow-card: 0 24px 40px rgba(0, 6, 40, 0.45), 0 0 0 1px rgba(81, 119, 255, 0.22);
-
-  --color-chip-transport-bg: #1691ff;
-  --color-chip-loan-bg: #8a4dff;
-  --color-chip-food-bg: #ff9e2e;
-  --color-chip-entertainment-bg: #e03e3e;
-  --color-chip-default-bg: #4f7fff;
-}
-
+/* ─── Base Styles ────────────────────────────────────────── */
 body {
   background-color: var(--color-page);
   color: var(--color-body);
+  font-family: var(--font-primary);
   font-size: 14px;
   line-height: 1.6;
-  font-family: "Plus Jakarta Sans", "Segoe UI", "Trebuchet MS", system-ui, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* Headings use Nunito (primary) — bold, rounded feel */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  color: var(--color-header);
+  font-weight: 700;
+}
+
+/* Labels, tags, buttons, nav — Montserrat (secondary) */
+button,
+label,
+.nav-link,
+.badge,
+.stat-label,
+.section-title,
+.cutoff-tag {
+  font-family: var(--font-secondary);
 }
 
 body.transitions-ready {
   transition: background-color 0.2s, color 0.2s;
 }
 
-/* Theme-aware element switching (driven by data-theme on <html>) */
-.theme-dark-only { display: none; }
+/* ─── Theme-aware element switching ──────────────────────── */
+.theme-dark-only  { display: none; }
 .theme-light-only { display: block; }
-[data-theme="dark"] .theme-dark-only { display: block; }
+[data-theme="dark"] .theme-dark-only  { display: block; }
 [data-theme="dark"] .theme-light-only { display: none; }
 
+/* ─── Component: Dashboard Card ─────────────────────────── */
 .dashboard-card {
   border: 1px solid var(--color-line);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: var(--color-card);
   box-shadow: var(--shadow-card);
 }
 
+/* ─── Component: Dashboard Chip ─────────────────────────── */
 .dashboard-chip {
   border: 1px solid var(--color-line);
   background: var(--color-surface);
   box-shadow: none;
 }
 
+/* ─── Component: Name Chip (avatar initials) ─────────────── */
 .name-chip {
   width: 28px;
   height: 28px;
@@ -156,16 +200,20 @@ body.transitions-ready {
   align-items: center;
   justify-content: center;
   color: #fff;
+  background-color: var(--color-accent);
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  font-size: 12px;
 }
 
-/* Navbar responsive */
+/* ─── Navbar Responsive ──────────────────────────────────── */
 @media (min-width: 768px) {
   .navbar-desktop { display: block !important; }
-  .navbar-mobile { display: none !important; }
-  .page-content { padding-bottom: 2rem !important; }
+  .navbar-mobile  { display: none !important; }
+  .page-content   { padding-bottom: 2rem !important; }
 }
 
-/* Override browser autofill background */
+/* ─── Autofill Override ──────────────────────────────────── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,

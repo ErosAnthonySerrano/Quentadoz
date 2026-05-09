@@ -67,7 +67,7 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
                     style={{
                       left: `${spentPct}%`,
                       width: `${remainingPct}%`,
-                      backgroundColor: 'var(--color-due-safe)',
+                      backgroundColor: 'var(--color-savings-bar)',
                     }}
                   />
                 )}
@@ -146,7 +146,7 @@ export function MonthlySummaryWidget({ cutoffs, items }: Props) {
                     style={{
                       left: `${cutoffSpentPct}%`,
                       width: `${100 - cutoffSpentPct}%`,
-                      backgroundColor: 'var(--color-due-safe)',
+                      backgroundColor: 'var(--color-savings-bar)',
                     }}
                   />
                 )}
