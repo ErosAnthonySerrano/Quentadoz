@@ -44,7 +44,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
   }, [itemPageCount])
 
   return (
-    <div className="dashboard-card p-6 h-full flex flex-col min-h-0">
+    <div className="dashboard-card p-6 flex flex-col">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h3 className="text-xs font-semibold text-muted uppercase tracking-wider">Expenses</h3>
         <Link
@@ -69,7 +69,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                       <span className="text-sm font-semibold text-title min-w-0">
                         {ordinalLabel(activeCutoff.cutoff_number)}
                       </span>
-                      <span className="text-xs text-muted min-w-0 break-words">
+                      <span className="text-xs text-muted min-w-0 wrap-break-word">
                         {formatDate(activeCutoff.date)} - {formatCurrency(activeCutoff.salary)}
                       </span>
                     </div>
@@ -84,7 +84,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                     >
                       <HiChevronLeft size={14} />
                     </button>
-                    <span className="text-[11px] text-muted min-w-[3.25rem] text-center">
+                    <span className="text-[11px] text-muted min-w-13 text-center">
                       {activeCutoffIdx + 1}/{cutoffs.length}
                     </span>
                     <button
@@ -153,7 +153,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                                 <td className="px-3 py-3 border-b border-line-light font-medium text-muted min-w-0">
                                   <div className="flex items-center gap-2.5 min-w-0">
                                     <ExpenseIdentityBadge name={item.name} />
-                                    <span className="min-w-0 break-words">{item.name}</span>
+                                    <span className="min-w-0 wrap-break-word">{item.name}</span>
                                   </div>
                                 </td>
                                 <td className="px-3 py-3 border-b border-line-light text-muted">
@@ -205,7 +205,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                     <span className="text-sm font-semibold text-title min-w-0">
                       {ordinalLabel(cutoff.cutoff_number)}
                     </span>
-                    <span className="text-xs text-muted min-w-0 break-words">
+                    <span className="text-xs text-muted min-w-0 wrap-break-word">
                       {formatDate(cutoff.date)} - {formatCurrency(cutoff.salary)}
                     </span>
                   </div>
@@ -226,7 +226,7 @@ export function ExpensesTableWidget({ cutoffs, items, updatingIds, onChangeStatu
                             <div className="flex items-start justify-between gap-2 mb-1.5 min-w-0">
                               <div className="flex items-center gap-2 min-w-0">
                                 <ExpenseIdentityBadge name={item.name} />
-                                <span className="text-sm font-medium leading-snug text-muted min-w-0 break-words">{item.name}</span>
+                                <span className="text-sm font-medium leading-snug text-muted min-w-0 wrap-break-word">{item.name}</span>
                               </div>
                               <span
                                 className={[

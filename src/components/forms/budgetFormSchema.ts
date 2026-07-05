@@ -1,5 +1,14 @@
 import { z } from 'zod'
 
+export const cutoffCountSchema = z.number().int().min(1).max(6, 'Cutoff count must be between 1 and 6')
+
+export function clampCutoffCount(value: number): number {
+  if (!Number.isFinite(value)) return 2
+  const rounded = Math.round(value)
+  const parsed = cutoffCountSchema.safeParse(rounded)
+  return parsed.success ? parsed.data : Math.min(6, Math.max(1, rounded))
+}
+
 export const itemSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Name is required'),

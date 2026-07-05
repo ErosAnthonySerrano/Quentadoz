@@ -10,7 +10,7 @@ import { ToastContainer, useToast } from '@/components/ui/Toast'
 import { HiSparkles } from 'react-icons/hi2'
 import { CutoffSection } from './CutoffSection'
 import { DivideModal } from './DivideModal'
-import { formSchema, emptyCutoff, emptyItem } from './budgetFormSchema'
+import { formSchema, emptyCutoff, emptyItem, clampCutoffCount } from './budgetFormSchema'
 import type { FormValues, ItemFormValue } from './budgetFormSchema'
 import { ordinalLabel, formatCurrency, formatDate } from '@/utils/budget'
 import { AIUploadModal } from './AIUploadModal'
@@ -47,12 +47,14 @@ function buildDefaultValues(
 ): FormValues {
   if (mode === 'edit' && existing) {
     const { budgetMonth, cutoffs: existingCutoffs, items } = existing
+    const visibleCutoffs = existingCutoffs
+      .sort((a, b) => a.cutoff_number - b.cutoff_number)
+      .slice(0, clampCutoffCount(cutoffCount))
+
     return {
       month: budgetMonth.month,
       year: budgetMonth.year,
-      cutoffs: existingCutoffs
-        .sort((a, b) => a.cutoff_number - b.cutoff_number)
-        .map((c) => {
+      cutoffs: visibleCutoffs.map((c) => {
           const cutoffItems = items
             .filter((i) => i.cutoff_id === c.id)
             .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
@@ -100,10 +102,10 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
   const now = new Date()
 
   // Step 1 state
-  const initialCutoffCount = existingData ? existingData.budgetMonth.cutoff_count : 2
+  const initialCutoffCount = clampCutoffCount(existingData ? existingData.budgetMonth.cutoff_count : 2)
   const [step, setStep] = useState<1 | 2 | 3>(mode === 'edit' ? 2 : 1)
   const [cutoffCount, setCutoffCount] = useState(initialCutoffCount)
-  const [customCount, setCustomCount] = useState('')
+  const [showHelperText, setShowHelperText] = useState(mode === 'new')
   const [loadingPrev, setLoadingPrev] = useState(false)
   const [prevBudget, setPrevBudget] = useState<ExistingData | null>(null)
   const [currBudget, setCurrBudget] = useState<ExistingData | null>(null)
@@ -197,7 +199,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
       if (data) {
         setUserDefaults(data.cutoffs as UserDefaultCutoff[])
         // Only auto-apply count from defaults if user hasn't changed it already
-        setCutoffCount(data.cutoff_count)
+        setCutoffCount(clampCutoffCount(data.cutoff_count))
       }
     }
     loadDefaults()
@@ -311,7 +313,7 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
   }
 
   function goToStep2(count: number, fromPrev?: ExistingData) {
-    const newCutoffCount = count
+    const newCutoffCount = clampCutoffCount(count)
     const targetMonth = now.getMonth() + 1
     const targetYear = now.getFullYear()
 
@@ -382,6 +384,24 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
     }
 
     setStep(2)
+  }
+
+  function addCutoffSection() {
+    if (cutoffFields.length >= 6) return
+    const nextNumber = cutoffFields.length + 1
+    appendCutoff(emptyCutoff(nextNumber))
+    setCutoffCount(nextNumber)
+    showToast('Cutoff section added.', 'success')
+  }
+
+  function removeCutoffSection(index: number) {
+    removeCutoff(index)
+    const remainingCutoffs = getValues('cutoffs') ?? []
+    remainingCutoffs.forEach((_, idx) => {
+      setValue(`cutoffs.${idx}.cutoff_number`, idx + 1, { shouldDirty: true, shouldValidate: true })
+    })
+    setCutoffCount(Math.max(1, remainingCutoffs.length))
+    showToast('Cutoff section removed.', 'success')
   }
 
   // ── Global AI parse (entire budget) ─────────────────────────────────────
@@ -738,10 +758,8 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
   // ─── Render: Step 1 ─────────────────────────────────────────────────────
 
   if (step === 1) {
-    const quickCounts = [1, 2, 3, 4]
-    const parsedCustom = customCount ? parseInt(customCount, 10) : NaN
-    const effectiveCount = customCount ? (isNaN(parsedCustom) ? 0 : parsedCustom) : cutoffCount
-    const overLimit = effectiveCount > 31
+    const quickCounts = [1, 2, 3, 4, 5, 6]
+    const effectiveCount = clampCutoffCount(cutoffCount)
 
     return (
       <div className="max-w-4xl mx-auto">
@@ -751,15 +769,18 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
           </h2>
           <p className="text-sm text-muted mb-6">Select the number of times you receive salary per month.</p>
 
-          <div className="flex gap-3 mb-4 flex-wrap">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-4">
             {quickCounts.map((n) => (
               <button
                 key={n}
                 type="button"
-                onClick={() => { setCutoffCount(n); setCustomCount('') }}
+                onClick={() => {
+                  setCutoffCount(n)
+                  setShowHelperText(false)
+                }}
                 className={[
-                  'w-14 h-14 rounded-lg text-lg font-semibold border transition-all shadow-md',
-                  cutoffCount === n && !customCount
+                  'min-h-11 rounded-lg text-base font-semibold border transition-all shadow-sm',
+                  effectiveCount === n
                     ? 'bg-accent text-white border-accent shadow-accent/20'
                     : 'bg-surface text-body border-line hover:border-accent',
                 ].join(' ')}
@@ -769,29 +790,15 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
             ))}
           </div>
 
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-sm text-muted">More than 4?</span>
-            <input
-              type="number"
-              min={5}
-              max={31}
-              value={customCount}
-              onChange={(e) => {
-                setCustomCount(e.target.value)
-                const val = parseInt(e.target.value, 10)
-                if (!isNaN(val) && val >= 5 && val <= 31) setCutoffCount(val)
-              }}
-              onFocus={(e) => e.target.select()}
-              placeholder="5+"
-              className={[
-                'w-20 px-3 py-2 rounded-md text-sm text-header bg-surface border outline-none shadow-md transition-all focus:border-accent',
-                overLimit ? 'border-due-danger' : 'border-line',
-              ].join(' ')}
-            />
-          </div>
-          {overLimit && (
-            <p className="text-xs text-due-danger mb-4 -mt-4">
-              Maximum allowed cutoffs is 31.
+          {mode === 'new' && showHelperText && (
+            <p className="text-sm text-muted mb-6">
+              A cutoff is a period between salary credits. If you get paid twice a month, select 2.
+            </p>
+          )}
+
+          {mode === 'edit' && existingData && existingData.budgetMonth.cutoff_count > 6 && (
+            <p className="text-sm text-accent mb-6">
+              Your cutoff count has been updated to the maximum of 6.
             </p>
           )}
 
@@ -871,8 +878,11 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
           <Button
             type="button"
             fullWidth
-            disabled={!effectiveCount || effectiveCount < 1 || overLimit}
-            onClick={() => goToStep2(effectiveCount)}
+            disabled={!effectiveCount || effectiveCount < 1}
+            onClick={() => {
+              setShowHelperText(false)
+              goToStep2(effectiveCount)
+            }}
           >
             Next → Enter Budget Items
           </Button>
@@ -891,6 +901,12 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
     return (
       <div className="max-w-4xl mx-auto">
       <form onSubmit={handleSubmit(() => setStep(3))} noValidate>
+        {mode === 'edit' && existingData && existingData.budgetMonth.cutoff_count > 6 && (
+          <div className="bg-accent-light border border-accent/30 rounded-lg p-3 mb-5 text-sm text-accent">
+            Your cutoff count has been updated to the maximum of 6.
+          </div>
+        )}
+
         {/* Month/Year selector */}
         <div className="bg-card rounded-lg shadow-md border border-line p-5 mb-5">
           <h2 className="text-xl font-semibold text-header mb-4">Budget Month</h2>
@@ -960,12 +976,26 @@ export function BudgetForm({ mode, existingData, reuseId }: BudgetFormProps) {
               setValue={setValue}
               totalCutoffs={cutoffFields.length}
               onDivideItem={openDivide}
+              onRemove={() => removeCutoffSection(i)}
               month={currentMonth}
               year={currentYear}
               otherSalaries={otherSalaries}
             />
           )
         })}
+
+        {cutoffFields.length < 6 && (
+          <div className="flex justify-center mt-2 mb-6">
+            <button
+              type="button"
+              onClick={addCutoffSection}
+              className="flex items-center gap-2 px-4 py-2 rounded-md border border-dashed border-accent text-sm font-medium text-accent hover:bg-accent-light transition-colors"
+            >
+              <span className="text-base leading-none">+</span>
+              <span>Add cutoff</span>
+            </button>
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="flex items-center justify-between mt-6">

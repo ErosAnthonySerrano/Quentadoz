@@ -29,6 +29,7 @@ interface CutoffSectionProps {
   setValue: UseFormSetValue<FormValues>
   totalCutoffs: number
   onDivideItem: (cutoffIndex: number, itemIndex: number) => void
+  onRemove: () => void
   month: number
   year: number
   otherSalaries: Array<{ label: string; salary: number }>
@@ -43,6 +44,7 @@ export function CutoffSection({
   setValue,
   totalCutoffs,
   onDivideItem,
+  onRemove,
   month,
   year,
   otherSalaries,
@@ -269,17 +271,29 @@ export function CutoffSection({
   return (
     <div className="bg-card rounded-lg shadow-md border border-line p-5 mb-5">
       {/* Section header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-3">
         <h2 className="text-xl font-semibold text-header">{ordinalLabel(cutoffIndex + 1)}</h2>
-        <button
-          type="button"
-          onClick={() => setAiModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-accent hover:bg-accent-light transition-colors cursor-pointer"
-          title="Scan receipt with AI"
-        >
-          <HiSparkles size={15} />
-          <span>Scan with AI</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onRemove}
+            disabled={totalCutoffs <= 1}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-due-danger hover:bg-due-danger/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            title={totalCutoffs <= 1 ? 'At least one cutoff is required' : 'Remove this cutoff'}
+          >
+            <HiOutlineTrash size={15} />
+            <span>Remove</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAiModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-accent hover:bg-accent-light transition-colors cursor-pointer"
+            title="Scan receipt with AI"
+          >
+            <HiSparkles size={15} />
+            <span>Scan with AI</span>
+          </button>
+        </div>
       </div>
 
       {/* Salary + Date */}

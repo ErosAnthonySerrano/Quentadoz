@@ -6,13 +6,12 @@ import type { BudgetMonth, Cutoff, BudgetItem } from "@/types";
 import { getDueStatus } from "@/utils/budget";
 import { EmptyState } from "@/components/widgets/EmptyState";
 import { DueSoonBanner } from "@/components/widgets/DueSoonBanner";
-import { CutoffSalaryWidget } from "@/components/widgets/CutoffSalaryWidget";
-import { TotalSummaryWidget } from "@/components/widgets/TotalSummaryWidget";
+import { SummaryCardsWidget } from "@/components/widgets/SummaryCardsWidget";
+import { CutoffOverviewWidget } from "@/components/widgets/CutoffOverviewWidget";
 import { ExpensesTableWidget } from "@/components/widgets/ExpensesTableWidget";
 import { MonthlySummaryWidget } from "@/components/widgets/MonthlySummaryWidget";
 import { DashboardSkeleton } from "@/components/widgets/DashboardSkeleton";
 import { ToastContainer, useToast } from "@/components/ui/Toast";
-import { HiOutlineHandRaised } from "react-icons/hi2";
 
 type LoadState = "loading" | "empty" | "loaded" | "error";
 
@@ -26,6 +25,7 @@ export default function DashboardPage() {
   const [items, setItems] = useState<BudgetItem[]>([]);
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [userName, setUserName] = useState("there");
 
   useEffect(() => {
     async function load() {
@@ -33,6 +33,15 @@ export default function DashboardPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Set user name
+      if (user?.user_metadata?.full_name) {
+        const firstName = user.user_metadata.full_name.split(" ")[0];
+        setUserName(firstName);
+      } else if (user?.email) {
+        const firstName = user.email.split("@")[0];
+        setUserName(firstName.charAt(0).toUpperCase() + firstName.slice(1));
+      }
 
       const now = new Date();
       const month = now.getMonth() + 1;
@@ -143,41 +152,34 @@ export default function DashboardPage() {
       {loadState === "empty" && <EmptyState />}
 
       {loadState === "loaded" && budgetMonth && (
-        <div className="flex flex-col gap-6 pb-16 xl:pb-0 xl:h-full xl:min-h-0 xl:overflow-hidden">
-          <div className="flex flex-col gap-6 pb-4 xl:grid xl:grid-cols-3 xl:grid-rows-[auto_minmax(0,1fr)] xl:items-stretch xl:gap-5 xl:flex-1 xl:min-h-0">
-            <section className="dashboard-card p-5 sm:p-6 md:p-8 xl:col-span-1 xl:h-full">
-              <div className="flex flex-col gap-5 sm:gap-6">
-                <div>
-                  <h1 className="text-3xl sm:text-4xl font-semibold text-header flex items-center gap-2 min-w-0">
-                    <span>
-                      {monthName} {year}
-                    </span>
-                    <HiOutlineHandRaised size={24} className="text-accent" />
-                  </h1>
-                  <p className="text-title text-xl sm:text-2xl mt-1">
-                    Welcome back!
-                  </p>
-                </div>
-              </div>
+        <div className="flex flex-col gap-6 pb-16 xl:pb-0">
+          {/* Greeting */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl sm:text-4xl font-semibold text-header">
+              Good evening, {userName}! 👋
+            </h1>
+            <p className="text-body">
+              Here&apos;s your financial overview for {monthName} {year}.
+            </p>
+          </div>
 
-              {dueSoonCount > 0 && !bannerDismissed && (
-                <div className="mt-5">
-                  <DueSoonBanner
-                    count={dueSoonCount}
-                    onDismiss={() => setBannerDismissed(true)}
-                  />
-                </div>
-              )}
-            </section>
+          {dueSoonCount > 0 && !bannerDismissed && (
+            <DueSoonBanner
+              count={dueSoonCount}
+              onDismiss={() => setBannerDismissed(true)}
+            />
+          )}
 
-            <div className="xl:col-span-1 xl:min-h-0 xl:h-full">
-              <CutoffSalaryWidget cutoffs={cutoffs} />
-            </div>
-            <div className="xl:col-span-1 xl:min-h-0 xl:h-full">
-              <TotalSummaryWidget cutoffs={cutoffs} items={items} />
-            </div>
+          {/* Summary cards */}
+          <SummaryCardsWidget cutoffs={cutoffs} items={items} />
 
-            <div className="xl:col-span-2 xl:min-h-0">
+          {/* Main content */}
+          <div className="flex flex-col gap-5 xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)] xl:items-start">
+            <div className="flex flex-col gap-5">
+              {/* Cutoff overview */}
+              <CutoffOverviewWidget cutoffs={cutoffs} />
+
+              {/* Expenses table */}
               <ExpensesTableWidget
                 cutoffs={cutoffs}
                 items={items}
@@ -187,7 +189,8 @@ export default function DashboardPage() {
               />
             </div>
 
-            <div className="xl:col-span-1 xl:min-h-0">
+            {/* Right sidebar */}
+            <div className="xl:sticky xl:top-4 h-full">
               <MonthlySummaryWidget cutoffs={cutoffs} items={items} />
             </div>
           </div>

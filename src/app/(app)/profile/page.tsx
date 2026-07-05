@@ -9,7 +9,7 @@ import { useBudgetStore } from '@/store/useBudgetStore'
 import { signOutAction } from '@/app/actions/auth'
 import type { User, UserDefault, UserDefaultCutoff } from '@/types'
 import { ordinalLabel } from '@/utils/budget'
-import { HiPlus, HiMinus } from 'react-icons/hi'
+import { clampCutoffCount } from '@/components/forms/budgetFormSchema'
 
 // ─── Delete confirmation modal ───────────────────────────────────────────────
 
@@ -92,7 +92,7 @@ export default function ProfilePage() {
 
       if (ud) {
         setUserDefault(ud)
-        setDefCutoffCount(ud.cutoff_count)
+        setDefCutoffCount(clampCutoffCount(ud.cutoff_count))
         const normalized = Array.from({ length: ud.cutoff_count }, (_, i) => {
           const existing = (ud.cutoffs as UserDefaultCutoff[]).find(
             (c) => c.cutoff_number === i + 1
@@ -251,23 +251,24 @@ export default function ProfilePage() {
         {/* Cutoff count */}
         <div className="mb-5">
           <label className="text-sm font-medium text-body block mb-2">Default Cutoff Count</label>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setDefCutoffCount((n) => Math.max(1, n - 1))}
-              className="w-8 h-8 rounded-md bg-surface border border-line flex items-center justify-center text-body hover:bg-line transition-all shadow-sm active:scale-95"
-            >
-              <HiMinus size={14} />
-            </button>
-            <span className="text-lg font-semibold text-header w-6 text-center">{defCutoffCount}</span>
-            <button
-              type="button"
-              onClick={() => setDefCutoffCount((n) => Math.min(31, n + 1))}
-              className="w-8 h-8 rounded-md bg-surface border border-line flex items-center justify-center text-body hover:bg-line transition-all shadow-sm active:scale-95"
-            >
-              <HiPlus size={14} />
-            </button>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setDefCutoffCount(n)}
+                className={[
+                  'min-h-11 rounded-lg border text-sm font-semibold transition-all shadow-sm',
+                  defCutoffCount === n
+                    ? 'bg-accent text-white border-accent shadow-accent/20'
+                    : 'bg-surface text-body border-line hover:border-accent',
+                ].join(' ')}
+              >
+                {n}
+              </button>
+            ))}
           </div>
+          <p className="text-xs text-muted mt-2">A cutoff is a period between salary credits. If you get paid twice a month, pick 2.</p>
         </div>
 
         {/* Per-cutoff salary + day */}
