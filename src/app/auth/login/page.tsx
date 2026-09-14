@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { BrandLogo } from '@/components/ui/BrandLogo'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,129 +11,37 @@ import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/Input'
 import { PasswordInput } from '@/components/ui/PasswordInput'
 import { Button } from '@/components/ui/Button'
+import { AuthLayout } from '@/components/ui/AuthLayout'
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-})
-
+const loginSchema = z.object({ email: z.string().email('Please enter a valid email address'), password: z.string().min(1, 'Password is required') })
 type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const router = useRouter()
-  const supabase = createClient()
-  const [serverError, setServerError] = useState<string | null>(null)
-  const [oauthLoading, setOauthLoading] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  })
-
+  const router = useRouter(); const supabase = createClient()
+  const [serverError, setServerError] = useState<string | null>(null); const [oauthLoading, setOauthLoading] = useState(false)
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) })
   const onSubmit = async (data: LoginFormData) => {
-    setServerError(null)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-
-    if (error) {
-      if (error.message.toLowerCase().includes('email not confirmed')) {
-        setServerError('Please confirm your email before logging in.')
-      } else {
-        setServerError('Invalid email or password.')
-      }
-      return
-    }
-
-    router.push('/dashboard')
-    router.refresh()
+    setServerError(null); const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password })
+    if (error) { setServerError(error.message.toLowerCase().includes('email not confirmed') ? 'Please confirm your email before logging in.' : 'Invalid email or password.'); return }
+    router.push('/dashboard'); router.refresh()
   }
-
   const handleGoogleLogin = async () => {
-    setOauthLoading(true)
-    setServerError(null)
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) {
-      setServerError('Something went wrong. Please try again.')
-      setOauthLoading(false)
-    }
+    setOauthLoading(true); setServerError(null)
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback` } })
+    if (error) { setServerError('Something went wrong. Please try again.'); setOauthLoading(false) }
   }
-
   return (
-    <div className="min-h-svh flex items-center justify-center py-6 px-4 bg-page">
-      <div className="w-full max-w-sm bg-card rounded-lg shadow-md border border-line px-8 py-10 flex flex-col gap-5">
-        <div className="flex flex-col items-center gap-1">
-          <BrandLogo width={180} />
-          <p className="text-sm text-muted">Welcome back</p>
-        </div>
-
-        <button
-          onClick={handleGoogleLogin}
-          disabled={oauthLoading || isSubmitting}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-5 rounded-md border border-line bg-secondary text-body text-sm font-medium cursor-pointer transition-all shadow-sm hover:bg-surface active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {oauthLoading ? (
-            <span className="inline-block w-3.5 h-3.5 border-2 border-body/20 border-t-body rounded-full animate-spin" />
-          ) : (
-            <FcGoogle size={18} />
-          )}
-          Continue with Google
-        </button>
-
-        <div className="flex items-center gap-3">
-          <span className="flex-1 h-px bg-line" />
-          <span className="text-xs text-muted">or</span>
-          <span className="flex-1 h-px bg-line" />
-        </div>
-
-        <form method="post" onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-          <Input
-            label="Email"
-            type="email"
-            autoComplete="email"
-            error={errors.email?.message}
-            {...register('email')}
-            className="shadow-sm"
-          />
-          <PasswordInput
-            label="Password"
-            autoComplete="current-password"
-            error={errors.password?.message}
-            {...register('password')}
-            className="shadow-sm"
-          />
-
-          <div className="flex justify-end -mt-2">
-            <Link href="/auth/forgot-password" className="text-xs text-accent font-medium no-underline hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-
-          {serverError && (
-            <p className="text-xs text-due-danger bg-due-danger-bg px-3 py-2.5 rounded-sm border border-due-danger shadow-sm">{serverError}</p>
-          )}
-
-          <Button type="submit" fullWidth loading={isSubmitting} disabled={oauthLoading} className="shadow-sm active:scale-95 transition-all">
-            Sign In
-          </Button>
-        </form>
-
-        <p className="text-center text-xs text-muted">
-          Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" className="text-accent font-medium no-underline hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </div>
+    <AuthLayout eyebrow="Welcome back" title="Sign in to Quentadoz" description="Pick up where you left off and keep your month moving with intention.">
+      <form method="post" onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+        <Input label="Email address" type="email" autoComplete="email" placeholder="you@example.com" error={errors.email?.message} {...register('email')} />
+        <PasswordInput label="Password" autoComplete="current-password" placeholder="Enter your password" error={errors.password?.message} {...register('password')} />
+        <div className="-mt-2 flex justify-end"><Link href="/auth/forgot-password" className="text-xs font-semibold text-accent hover:underline">Forgot password?</Link></div>
+        {serverError && <p className="rounded-xl border border-due-danger bg-due-danger-bg px-4 py-3 text-sm text-due-danger">{serverError}</p>}
+        <Button type="submit" fullWidth loading={isSubmitting} disabled={oauthLoading} className="rounded-xl py-3.5 shadow-lg shadow-accent/20 active:scale-[.99]">Sign In</Button>
+      </form>
+      <div className="my-6 flex items-center gap-3 text-xs text-muted"><span className="h-px flex-1 bg-line" /><span>or continue with</span><span className="h-px flex-1 bg-line" /></div>
+      <button onClick={handleGoogleLogin} disabled={oauthLoading || isSubmitting} className="flex w-full items-center justify-center gap-2 rounded-xl border border-line bg-secondary px-5 py-3.5 text-sm font-semibold text-body shadow-sm transition hover:bg-surface active:scale-[.99] disabled:cursor-not-allowed disabled:opacity-60">{oauthLoading ? <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-body/20 border-t-body" /> : <FcGoogle size={18} />}Continue with Google</button>
+      <p className="mt-6 text-center text-sm text-muted">Don&apos;t have an account? <Link href="/auth/signup" className="font-semibold text-accent hover:underline">Create an account</Link></p>
+    </AuthLayout>
   )
 }

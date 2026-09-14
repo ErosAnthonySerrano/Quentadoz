@@ -18,7 +18,7 @@ export function Input({ label, error, id, className, ...props }: InputProps) {
         id={inputId}
         {...props}
         className={[
-          'w-full px-3 py-3 rounded-md text-sm text-header bg-surface outline-none transition-colors border',
+          'w-full rounded-xl border bg-surface px-4 py-3.5 text-sm text-header outline-none transition placeholder:text-muted focus:border-accent focus:ring-4 focus:ring-accent-light',
           error ? 'border-due-danger' : 'border-line',
           className ?? '',
         ]

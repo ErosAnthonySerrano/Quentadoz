@@ -25,7 +25,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             type={visible ? 'text' : 'password'}
             {...props}
             className={[
-              'w-full pl-3 pr-10 py-3 rounded-md text-sm text-header bg-surface outline-none transition-colors border',
+              'w-full rounded-xl border bg-surface py-3.5 pl-4 pr-11 text-sm text-header outline-none transition placeholder:text-muted focus:border-accent focus:ring-4 focus:ring-accent-light',
               error ? 'border-due-danger' : 'border-line',
               className ?? '',
             ]
@@ -37,7 +37,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             onClick={() => setVisible((v) => !v)}
             tabIndex={-1}
             aria-label={visible ? 'Hide password' : 'Show password'}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center text-muted bg-transparent border-none cursor-pointer hover:text-body transition-colors p-0.5"
+            className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center rounded-lg p-2 text-muted transition-colors hover:bg-accent-light hover:text-body"
           >
             {visible ? <FiEyeOff size={16} /> : <FiEye size={16} />}
           </button>
