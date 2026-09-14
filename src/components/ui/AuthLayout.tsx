@@ -36,7 +36,7 @@ export function AuthLayout({ eyebrow, title, description, children, compact = fa
 
       <div className={`relative mx-auto grid min-h-[calc(100svh-3rem)] w-full items-center gap-10 ${compact ? 'max-w-4xl lg:grid-cols-[.85fr_25rem] lg:gap-16' : 'max-w-6xl lg:grid-cols-[1fr_27rem] lg:gap-24'}`}>
         <section className="hidden lg:block">
-          <MainLogo className="h-auto w-[280px] object-contain" />
+          <MainLogo className="h-auto w-70 object-contain" />
           <div className="mt-12 max-w-xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-accent shadow-sm">
               <FiShield size={14} />
@@ -61,7 +61,7 @@ export function AuthLayout({ eyebrow, title, description, children, compact = fa
 
         <section className="w-full rounded-[1.75rem] border border-line bg-card p-6 shadow-[0_24px_70px_rgba(14,32,54,0.12)] sm:p-9">
           <div className="mb-8 flex items-center justify-between lg:hidden">
-            <MainLogo className="h-auto w-[220px] object-contain" />
+            <MainLogo className="h-auto w-55 object-contain" />
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-light text-accent">
               <FiShield size={18} />
             </div>
