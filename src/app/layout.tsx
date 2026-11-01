@@ -23,8 +23,6 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/favicon-light.ico" sizes="any" media="(prefers-color-scheme: light)" />
-        <link rel="icon" href="/favicon-dark.ico" sizes="any" media="(prefers-color-scheme: dark)" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
